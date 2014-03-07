@@ -24,8 +24,6 @@ import java.lang.annotation.Target;
 
 import org.springframework.context.annotation.Import;
 
-import ratpack.spring.internal.ChainConfigurers;
-
 /**
  * @author Dave Syer
  *
@@ -33,7 +31,7 @@ import ratpack.spring.internal.ChainConfigurers;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import(ChainConfigurers.class)
+@Import(RatpackConfiguration.class)
 public @interface EnableRatpack {
 
 }

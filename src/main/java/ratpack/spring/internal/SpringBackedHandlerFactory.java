@@ -16,41 +16,28 @@
 
 package ratpack.spring.internal;
 
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.ApplicationContext;
 
 import ratpack.handling.Handler;
 import ratpack.handling.Handlers;
 import ratpack.handling.internal.ClientErrorForwardingHandler;
+import ratpack.launch.HandlerFactory;
 import ratpack.launch.LaunchConfig;
 
 /**
  * @author Dave Syer
  * 
  */
-public class SpringBackedHandlerFactory {
+public class SpringBackedHandlerFactory implements HandlerFactory {
 
-	private LaunchConfig launchConfig;
+	private ApplicationContext context;
 
-	private SpringApplicationBuilder builder = new SpringApplicationBuilder();
-
-	private String[] args;
-
-	private Object[] sources;
-
-	public SpringBackedHandlerFactory(LaunchConfig launchConfig) {
+	public SpringBackedHandlerFactory(ApplicationContext context) {
+		this.context = context;
 	}
 
-	public SpringBackedHandlerFactory(LaunchConfig launchConfig, String[] args,
-			Object[] sources) {
-		this.launchConfig = launchConfig;
-		this.args = args;
-		this.sources = sources;
-	}
-
-	public Handler create() throws Exception {
-		builder.sources(sources);
-		ConfigurableApplicationContext context = builder.run(args);
+	@Override
+	public Handler create(LaunchConfig launchConfig) throws Exception {
 		SpringBackedRegistry registry = new SpringBackedRegistry(context);
 		return Handlers.chain(
 				Handlers.chain(launchConfig, registry,
