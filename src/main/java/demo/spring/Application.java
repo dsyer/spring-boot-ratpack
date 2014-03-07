@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Configuration;
 
 import ratpack.func.Action;
 import ratpack.handling.Chain;
+import ratpack.handling.Context;
+import ratpack.handling.Handler;
 import ratpack.launch.LaunchConfig;
 import ratpack.launch.LaunchConfigBuilder;
 import ratpack.server.RatpackServerBuilder;
@@ -17,20 +19,20 @@ import ratpack.spring.annotation.EnableRatpack;
 @Configuration
 @EnableAutoConfiguration
 @EnableRatpack
-class Application implements Action<Chain> {
+public class Application implements Action<Chain> {
 
 	public void execute(Chain chain) {
 		chain.get("", handler());
 	}
 
 	@Bean
-	public SomeService service() {
-		return new SomeService();
-	}
-
-	@Bean
-	public InjectedHandler handler() {
-		return new InjectedHandler(service());
+	public Handler handler() {
+		return new Handler() {
+			@Override
+			public void handle(Context context) throws Exception {
+				context.render("Hello World");
+			}
+		};
 	}
 
 	public static void main(String[] args) throws Exception {
