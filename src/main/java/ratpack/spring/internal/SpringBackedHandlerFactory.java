@@ -18,11 +18,13 @@ package ratpack.spring.internal;
 
 import org.springframework.context.ApplicationContext;
 
+import ratpack.handling.Context;
 import ratpack.handling.Handler;
 import ratpack.handling.Handlers;
 import ratpack.handling.internal.ClientErrorForwardingHandler;
 import ratpack.launch.HandlerFactory;
 import ratpack.launch.LaunchConfig;
+import ratpack.registry.Registry;
 
 /**
  * @author Dave Syer
@@ -40,9 +42,26 @@ public class SpringBackedHandlerFactory implements HandlerFactory {
 	public Handler create(LaunchConfig launchConfig) throws Exception {
 		SpringBackedRegistry registry = new SpringBackedRegistry(context);
 		return Handlers.chain(
-				Handlers.chain(launchConfig, registry,
-						registry.get(ChainConfigurers.class)),
+				new RegistryHandler(registry, Handlers.chain(launchConfig, registry,
+						registry.get(ChainConfigurers.class))),
 				new ClientErrorForwardingHandler(404));
+	}
+	
+	private static class RegistryHandler implements Handler {
+
+		private Registry registry;
+		private Handler chain;
+
+		public RegistryHandler(Registry registry, Handler chain) {
+			this.registry = registry;
+			this.chain = chain;
+		}
+
+		@Override
+		public void handle(Context context) throws Exception {
+			context.insert(registry, chain);
+		}
+		
 	}
 
 }

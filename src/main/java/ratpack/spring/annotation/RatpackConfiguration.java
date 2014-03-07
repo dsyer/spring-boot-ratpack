@@ -17,23 +17,37 @@
 package ratpack.spring.annotation;
 
 import java.io.File;
+import java.util.Collection;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import org.springframework.beans.factory.BeanFactoryUtils;
+import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.web.HttpMapperProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 
+import ratpack.jackson.JsonRenderer;
+import ratpack.jackson.internal.DefaultJsonRenderer;
 import ratpack.launch.LaunchConfig;
 import ratpack.launch.LaunchConfigBuilder;
 import ratpack.server.RatpackServer;
 import ratpack.server.RatpackServerBuilder;
 import ratpack.spring.internal.ChainConfigurers;
 import ratpack.spring.internal.SpringBackedHandlerFactory;
+
+import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
  * @author Dave Syer
@@ -79,6 +93,45 @@ public class RatpackConfiguration implements CommandLineRunner {
 		public RatpackServer ratpackServer() {
 			RatpackServer server = RatpackServerBuilder.build(launchConfig);
 			return server;
+		}
+
+	}
+	
+	@Configuration
+	@ConditionalOnClass(ObjectMapper.class)
+	@EnableConfigurationProperties(HttpMapperProperties.class)
+	protected static class ObjectMappers {
+
+		@Autowired
+		private HttpMapperProperties properties = new HttpMapperProperties();
+
+		@Autowired
+		private ListableBeanFactory beanFactory;
+
+		@PostConstruct
+		public void init() {
+			Collection<ObjectMapper> mappers = BeanFactoryUtils
+					.beansOfTypeIncludingAncestors(this.beanFactory, ObjectMapper.class)
+					.values();
+			Collection<Module> modules = BeanFactoryUtils.beansOfTypeIncludingAncestors(
+					this.beanFactory, Module.class).values();
+			for (ObjectMapper mapper : mappers) {
+				mapper.registerModules(modules);
+				mapper.configure(SerializationFeature.INDENT_OUTPUT, properties.isJsonPrettyPrint());
+			}
+		}
+
+		@Bean
+		@ConditionalOnMissingBean
+		@Primary
+		public ObjectMapper jacksonObjectMapper() {
+			return new ObjectMapper();
+		}
+
+		@Bean
+		@ConditionalOnMissingBean
+		public JsonRenderer jsonRenderer() {
+			return new DefaultJsonRenderer(jacksonObjectMapper().writer());
 		}
 
 	}
