@@ -16,13 +16,10 @@
 
 package ratpack.spring;
 
-import org.springframework.boot.builder.SpringApplicationBuilder;
-
-import ratpack.func.Action;
-import ratpack.handling.Chain;
 import ratpack.handling.Handler;
+import ratpack.launch.HandlerFactory;
 import ratpack.launch.LaunchConfig;
-import ratpack.spring.internal.DefaultSpringBackedHandlerFactory;
+import ratpack.spring.internal.SpringBackedHandlerFactory;
 
 /**
  * @author Dave Syer
@@ -30,11 +27,13 @@ import ratpack.spring.internal.DefaultSpringBackedHandlerFactory;
  */
 public class Spring {
 
-	public static Handler handler(LaunchConfig launchConfig,
-			Action<? super SpringApplicationBuilder> applicationConfigurer,
-			final Action<? super Chain> chainConfigurer) throws Exception {
-		return new DefaultSpringBackedHandlerFactory(launchConfig).create(
-				applicationConfigurer, chainConfigurer);
+	public static HandlerFactory handlers(final String[] args, final Object... sources) {
+		return new HandlerFactory() {
+			@Override
+			public Handler create(LaunchConfig launchConfig) throws Exception {
+				return new SpringBackedHandlerFactory(launchConfig, args, sources).create();
+			}
+		};
 	}
 
 }

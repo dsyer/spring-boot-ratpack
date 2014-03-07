@@ -14,27 +14,26 @@
  * limitations under the License.
  */
 
-package ratpack.spring.internal;
+package ratpack.spring.annotation;
 
-import ratpack.handling.Context;
-import ratpack.handling.Handler;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+import org.springframework.context.annotation.Import;
+
+import ratpack.spring.internal.ChainConfigurers;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
-public class ApplicationContextBindingHandler implements Handler {
-
-	private final Handler handler;
-	private SpringBackedRegistry registry;
-
-	public ApplicationContextBindingHandler(SpringBackedRegistry registry, Handler handler) {
-		this.registry = registry;
-		this.handler = handler;
-	}
-
-	public void handle(Context context) {
-		context.insert(registry, handler);
-	}
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Import(ChainConfigurers.class)
+public @interface EnableRatpack {
 
 }

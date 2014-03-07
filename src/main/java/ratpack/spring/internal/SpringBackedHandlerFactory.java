@@ -17,9 +17,8 @@
 package ratpack.spring.internal;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.ConfigurableApplicationContext;
 
-import ratpack.func.Action;
-import ratpack.handling.Chain;
 import ratpack.handling.Handler;
 import ratpack.handling.Handlers;
 import ratpack.handling.internal.ClientErrorForwardingHandler;
@@ -29,20 +28,34 @@ import ratpack.launch.LaunchConfig;
  * @author Dave Syer
  * 
  */
-public class DefaultSpringBackedHandlerFactory {
+public class SpringBackedHandlerFactory {
 
 	private LaunchConfig launchConfig;
 
-	public DefaultSpringBackedHandlerFactory(LaunchConfig launchConfig) {
-		this.launchConfig = launchConfig;
+	private SpringApplicationBuilder builder = new SpringApplicationBuilder();
+
+	private String[] args;
+
+	private Object[] sources;
+
+	public SpringBackedHandlerFactory(LaunchConfig launchConfig) {
 	}
 
-	public Handler create(Action<? super SpringApplicationBuilder> applicationAction,
-			Action<? super Chain> chainConfigurer) throws Exception {
-		SpringApplicationBuilder builder = new SpringApplicationBuilder();
-		applicationAction.execute(builder); // TODO : apply launch config
-		return Handlers.chain(Handlers.chain(launchConfig, new SpringBackedRegistry(
-				builder.run()), chainConfigurer), new ClientErrorForwardingHandler(404));
+	public SpringBackedHandlerFactory(LaunchConfig launchConfig, String[] args,
+			Object[] sources) {
+		this.launchConfig = launchConfig;
+		this.args = args;
+		this.sources = sources;
+	}
+
+	public Handler create() throws Exception {
+		builder.sources(sources);
+		ConfigurableApplicationContext context = builder.run(args);
+		SpringBackedRegistry registry = new SpringBackedRegistry(context);
+		return Handlers.chain(
+				Handlers.chain(launchConfig, registry,
+						registry.get(ChainConfigurers.class)),
+				new ClientErrorForwardingHandler(404));
 	}
 
 }
