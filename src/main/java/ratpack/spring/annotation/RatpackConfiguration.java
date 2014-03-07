@@ -16,7 +16,6 @@
 
 package ratpack.spring.annotation;
 
-import java.io.File;
 import java.util.Collection;
 
 import javax.annotation.PostConstruct;
@@ -55,6 +54,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
  */
 @Configuration
 @Import(ChainConfigurers.class)
+@EnableConfigurationProperties(RatpackProperties.class)
 public class RatpackConfiguration implements CommandLineRunner {
 
 	@Autowired
@@ -64,7 +64,7 @@ public class RatpackConfiguration implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		server.start();
 	}
-	
+
 	@PreDestroy
 	public void stop() throws Exception {
 		server.stop();
@@ -73,11 +73,22 @@ public class RatpackConfiguration implements CommandLineRunner {
 	@Configuration
 	protected static class LaunchConfiguration {
 
+		@Autowired
+		private RatpackProperties ratpack;
+
 		@Bean
 		@ConditionalOnMissingBean
 		public LaunchConfig ratpackLaunchConfig(ApplicationContext context) {
-			return LaunchConfigBuilder.baseDir(new File(".")).build(
-					new SpringBackedHandlerFactory(context));
+			// @formatter:off
+			LaunchConfigBuilder builder = LaunchConfigBuilder
+					.baseDir(ratpack.getBasedir())
+					.address(ratpack.getAddress())
+					.threads(ratpack.getMaxThreads());
+			// @formatter:on
+			if (ratpack.getPort()!=null) {
+				builder.port(ratpack.getPort());
+			}
+			return builder.build(new SpringBackedHandlerFactory(context));
 		}
 
 	}
@@ -96,7 +107,7 @@ public class RatpackConfiguration implements CommandLineRunner {
 		}
 
 	}
-	
+
 	@Configuration
 	@ConditionalOnClass(ObjectMapper.class)
 	@EnableConfigurationProperties(HttpMapperProperties.class)
@@ -117,7 +128,8 @@ public class RatpackConfiguration implements CommandLineRunner {
 					this.beanFactory, Module.class).values();
 			for (ObjectMapper mapper : mappers) {
 				mapper.registerModules(modules);
-				mapper.configure(SerializationFeature.INDENT_OUTPUT, properties.isJsonPrettyPrint());
+				mapper.configure(SerializationFeature.INDENT_OUTPUT,
+						properties.isJsonPrettyPrint());
 			}
 		}
 
