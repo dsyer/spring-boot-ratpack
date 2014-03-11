@@ -69,7 +69,7 @@ public class RatpackConfiguration implements CommandLineRunner {
 	public void stop() throws Exception {
 		server.stop();
 	}
-
+	
 	@Configuration
 	protected static class LaunchConfiguration {
 

@@ -16,6 +16,7 @@
 
 package ratpack.spring.internal;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -27,6 +28,7 @@ import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 
 import ratpack.func.Action;
 import ratpack.handling.Chain;
+import ratpack.handling.Handler;
 
 /**
  * @author Dave Syer
@@ -37,10 +39,16 @@ import ratpack.handling.Chain;
 @ConditionalOnClass(Chain.class)
 public class ChainConfigurers implements Action<Chain> {
 
-	@Autowired
+	@Autowired(required=false)
 	private List<Action<Chain>> delegates = Collections.emptyList();
 
+	@Autowired(required=false)
+	private List<Handler> handlers = Collections.emptyList();
+
 	public void execute(Chain chain) throws Exception {
+		if (delegates.isEmpty()) {
+			delegates = Arrays.asList(singleHandlerAction());
+		}
 		AnnotationAwareOrderComparator.sort(delegates);
 		for (Action<Chain> delegate : delegates) {
 			if (!(delegate instanceof ChainConfigurers)) {
@@ -48,4 +56,19 @@ public class ChainConfigurers implements Action<Chain> {
 			}
 		}
 	}
+
+	private Action<Chain> singleHandlerAction() {
+		return new Action<Chain>() {
+			public void execute(Chain chain) {
+				if (handlers.size() == 1) {
+					chain.get(handlers.get(0));
+				} else {
+					throw new IllegalStateException(
+							"No Action<Chain> defined to expecting a single Handler (found "
+									+ handlers.size() + ")");
+				}
+			}
+		};
+	}
+
 }
