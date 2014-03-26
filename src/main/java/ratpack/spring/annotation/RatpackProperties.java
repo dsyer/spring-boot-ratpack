@@ -27,7 +27,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author Dave Syer
  *
  */
-@ConfigurationProperties(path="server", ignoreUnknownFields = false)
+@ConfigurationProperties(prefix="server", ignoreUnknownFields = false)
 public class RatpackProperties {
 
 	private Integer port;
