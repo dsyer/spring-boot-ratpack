@@ -35,6 +35,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 
+import ratpack.groovy.templating.TemplatingConfig;
+import ratpack.groovy.templating.internal.DefaultTemplatingConfig;
+import ratpack.groovy.templating.internal.GroovyTemplateRenderingEngine;
+import ratpack.groovy.templating.internal.TemplateRenderer;
+import ratpack.groovy.templating.internal.TemplateRenderingClientErrorHandler;
+import ratpack.groovy.templating.internal.TemplateRenderingServerErrorHandler;
 import ratpack.jackson.JsonRenderer;
 import ratpack.jackson.internal.DefaultJsonRenderer;
 import ratpack.launch.LaunchConfig;
@@ -69,7 +75,7 @@ public class RatpackConfiguration implements CommandLineRunner {
 	public void stop() throws Exception {
 		server.stop();
 	}
-	
+
 	@Configuration
 	protected static class LaunchConfiguration {
 
@@ -81,11 +87,11 @@ public class RatpackConfiguration implements CommandLineRunner {
 		public LaunchConfig ratpackLaunchConfig(ApplicationContext context) {
 			// @formatter:off
 			LaunchConfigBuilder builder = LaunchConfigBuilder
-					.baseDir(ratpack.getBasedir())
+					.baseDir(ratpack.getBasepath())
 					.address(ratpack.getAddress())
 					.threads(ratpack.getMaxThreads());
 			// @formatter:on
-			if (ratpack.getPort()!=null) {
+			if (ratpack.getPort() != null) {
 				builder.port(ratpack.getPort());
 			}
 			return builder.build(new SpringBackedHandlerFactory(context));
@@ -147,5 +153,48 @@ public class RatpackConfiguration implements CommandLineRunner {
 		}
 
 	}
+
+	@Configuration
+	@ConditionalOnClass(GroovyTemplateRenderingEngine.class)
+	protected static class GroovyTemplateConfiguration {
+
+		@Autowired
+		private RatpackProperties ratpack;
+
+		@Autowired
+		private LaunchConfig launchConfig;
+
+		@Bean
+		@ConditionalOnMissingBean
+		public TemplateRenderer groovyTemplateRenderer() {
+			return new TemplateRenderer(groovyTemplateRenderingEngine());
+		}
+
+		@Bean
+		@ConditionalOnMissingBean
+		public GroovyTemplateRenderingEngine groovyTemplateRenderingEngine() {
+			return new GroovyTemplateRenderingEngine(launchConfig, templatingConfig());
+		}
+
+		@Bean
+		@ConditionalOnMissingBean
+		public TemplatingConfig templatingConfig() {
+			return new DefaultTemplatingConfig(ratpack.getTemplatesPath(),
+					ratpack.getCacheSize(), ratpack.isReloadable()
+							|| launchConfig.isReloadable(), ratpack.isStaticallyCompile());
+		}
+
+		@Bean
+		protected TemplateRenderingClientErrorHandler clientErrorHandler() {
+			return new TemplateRenderingClientErrorHandler();
+		}
+
+		@Bean
+		protected TemplateRenderingServerErrorHandler serverErrorHandler() {
+			return new TemplateRenderingServerErrorHandler();
+		}
+
+	}
+
 
 }

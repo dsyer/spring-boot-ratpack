@@ -23,12 +23,14 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 
 import ratpack.func.Action;
 import ratpack.handling.Chain;
 import ratpack.handling.Handler;
+import ratpack.spring.groovy.internal.RatpackScriptActionFactory;
 
 /**
  * @author Dave Syer
@@ -44,8 +46,16 @@ public class ChainConfigurers implements Action<Chain> {
 
 	@Autowired(required=false)
 	private List<Handler> handlers = Collections.emptyList();
+	
+	@Bean
+	protected RatpackScriptActionFactory ratpackScriptBacking() {
+		return new RatpackScriptActionFactory();
+	}
 
 	public void execute(Chain chain) throws Exception {
+		if (delegates.isEmpty()) {
+			delegates = ratpackScriptBacking().getHandlerActions();
+		}
 		if (delegates.isEmpty()) {
 			delegates = Arrays.asList(singleHandlerAction());
 		}
