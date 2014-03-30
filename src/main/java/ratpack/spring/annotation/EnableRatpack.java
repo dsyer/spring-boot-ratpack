@@ -31,7 +31,7 @@ import org.springframework.context.annotation.Import;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import(RatpackConfiguration.class)
+@Import(RatpackAutoConfiguration.class)
 public @interface EnableRatpack {
 
 }

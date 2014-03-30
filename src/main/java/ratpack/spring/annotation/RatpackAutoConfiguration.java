@@ -61,7 +61,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 @Configuration
 @Import(ChainConfigurers.class)
 @EnableConfigurationProperties(RatpackProperties.class)
-public class RatpackConfiguration implements CommandLineRunner {
+public class RatpackAutoConfiguration implements CommandLineRunner {
 
 	@Autowired
 	private RatpackServer server;
