@@ -112,6 +112,6 @@ $ (cd spring-boot-cli; mvn install -DskipTests=true)
 Once it is built, you can install this version of the CLI using [`gvm`](http://gvmtool.net):
 
 ```
-$ gvm install springboot dev spring-boot-cli/target/spring-boot-cli-1.0.0.BUILD-SNAPSHOT-bin.zip
+$ gvm install springboot dev $PWD/spring-boot-cli/target/spring-boot-cli-*-bin/spring-*
 $ gvm use springboot dev
 ```
