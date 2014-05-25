@@ -33,7 +33,7 @@ its execute method.
 
 ## Quick Groovy DSL Example
 
-Ratpack has a nice Groovy DSL for building routes. Spring Boot CLI
+Ratpack has a Groovy DSL for building routes. Spring Boot CLI
 applications can take advantage of the nice syntax as follows.
 
 This should run (as it is, with no imports):
@@ -73,8 +73,8 @@ class MyService {
 
 ratpack {
   handlers {
-    get { MyService -> service
-      render json(service.message())
+    get { MyService service ->
+      render json([msg:service.message()])
     }
   }
 }
