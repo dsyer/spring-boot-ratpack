@@ -35,6 +35,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 
+import ratpack.exec.ExecControl;
 import ratpack.groovy.templating.TemplatingConfig;
 import ratpack.groovy.templating.internal.DefaultTemplatingConfig;
 import ratpack.groovy.templating.internal.GroovyTemplateRenderingEngine;
@@ -100,17 +101,23 @@ public class RatpackAutoConfiguration implements CommandLineRunner {
 	}
 
 	@Configuration
+	@ConditionalOnMissingBean(RatpackServer.class)
 	protected static class ServerConfiguration {
 
 		@Autowired
 		private LaunchConfig launchConfig;
 
 		@Bean
-		@ConditionalOnMissingBean
 		public RatpackServer ratpackServer() {
 			RatpackServer server = RatpackServerBuilder.build(launchConfig);
 			return server;
 		}
+		
+		@Bean
+		public ExecControl ratpackExecControl() {
+			return launchConfig.getExecController().getControl();
+		}
+		
 
 	}
 
@@ -164,16 +171,19 @@ public class RatpackAutoConfiguration implements CommandLineRunner {
 		@Autowired
 		private LaunchConfig launchConfig;
 
+		@Autowired
+		private ExecControl execControl;
+
 		@Bean
 		@ConditionalOnMissingBean
 		public TemplateRenderer groovyTemplateRenderer() {
-			return new TemplateRenderer(groovyTemplateRenderingEngine());
+			return new TemplateRenderer(groovyTemplateRenderingEngine(), launchConfig.getBufferAllocator());
 		}
 
 		@Bean
 		@ConditionalOnMissingBean
 		public GroovyTemplateRenderingEngine groovyTemplateRenderingEngine() {
-			return new GroovyTemplateRenderingEngine(launchConfig, templatingConfig());
+			return new GroovyTemplateRenderingEngine(launchConfig, templatingConfig(), execControl);
 		}
 
 		@Bean
@@ -186,12 +196,12 @@ public class RatpackAutoConfiguration implements CommandLineRunner {
 
 		@Bean
 		protected TemplateRenderingClientErrorHandler clientErrorHandler() {
-			return new TemplateRenderingClientErrorHandler();
+			return new TemplateRenderingClientErrorHandler(launchConfig.getBufferAllocator(), groovyTemplateRenderingEngine());
 		}
 
 		@Bean
 		protected TemplateRenderingServerErrorHandler serverErrorHandler() {
-			return new TemplateRenderingServerErrorHandler();
+			return new TemplateRenderingServerErrorHandler(launchConfig.getBufferAllocator(), groovyTemplateRenderingEngine());
 		}
 
 	}

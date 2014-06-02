@@ -81,7 +81,7 @@ ratpack {
 ```
 
 The `ratpack` DSL keyword only supports `handlers` inside its
-top-level closure (in non-Spring apps you might see `modules` as
+top-level closure (in non-Spring apps you might see `bindings` as
 well).
 
 ## Installing the Spring Boot CLI
