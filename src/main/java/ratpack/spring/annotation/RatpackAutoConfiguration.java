@@ -44,6 +44,7 @@ import ratpack.groovy.templating.internal.TemplateRenderingClientErrorHandler;
 import ratpack.groovy.templating.internal.TemplateRenderingServerErrorHandler;
 import ratpack.jackson.JsonRenderer;
 import ratpack.jackson.internal.DefaultJsonRenderer;
+import ratpack.jackson.internal.JsonParser;
 import ratpack.launch.LaunchConfig;
 import ratpack.launch.LaunchConfigBuilder;
 import ratpack.server.RatpackServer;
@@ -157,6 +158,12 @@ public class RatpackAutoConfiguration implements CommandLineRunner {
 		@ConditionalOnMissingBean
 		public JsonRenderer jsonRenderer() {
 			return new DefaultJsonRenderer(jacksonObjectMapper().writer());
+		}
+
+		@Bean
+		@ConditionalOnMissingBean
+		public JsonParser jsonParser() {
+			return new JsonParser(jacksonObjectMapper());
 		}
 
 	}
