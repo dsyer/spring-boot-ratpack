@@ -52,7 +52,7 @@ public class RatpackProperties {
 	@NotNull
 	private String contextPath = "";
 
-	private int maxThreads = 0; // Number of threads in protocol handler
+	private int maxThreads = 10; // Number of threads in protocol handler
 
 	private String templatesPath = "templates";
 	private int cacheSize = 100;
