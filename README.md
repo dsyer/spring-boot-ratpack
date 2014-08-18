@@ -88,30 +88,41 @@ well).
 
 To run an application written in the Ratpack DSL you need the ratpack
 extensions to the
-[Spring Boot CLI](http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#getting-started-installing-the-cli). See
-below for instructions on where to get the extensions.
+[Spring Boot CLI](http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#getting-started-installing-the-cli).
 
-Since the Ratpack extensions are not yet part of the main Spring Boot
+Since the Ratpack extensions are not part of the main Spring Boot
 feature set you will need to clone from
-[my fork](https://github.com/dsyer/spring-boot) and checkout the
-"feature/ratpack" branch. Build it locally, e.g.
+[this repo](https://github.com/dsyer/spring-boot-ratpack) and build it
+locally, e.g.
 
 ```
-$ git clone https://github.com/dsyer/spring-boot
-$ cd spring-boot
-$ git checkout feature/ratpack
+$ git clone https://github.com/dsyer/spring-boot-ratpack
+$ cd spring-boot-ratpack
 $ mvn install
 ```
 
-or, more quickly,
+Once it is built, you can install the ratpack plugin by copying its
+jar file to the CLI lib directory. You either need to build Spring
+Boot or download a snapshot build of the CLI first, e.g. using
+[`gvm`](http://gvmtool.net):
 
 ```
-$ (cd spring-boot-cli; mvn install -DskipTests=true)
+$ mkdir -p /tmp/spring && cd $_
+$ wget -O spring.tgz https://repo.spring.io/libs-snapshot-local/org/springframework/boot/spring-boot-cli/1.2.0.BUILD-SNAPSHOT/spring-boot-cli-1.2.0.BUILD-SNAPSHOT-bin.tar.gz
+$ tar -zxf spring.tgz
 ```
 
-Once it is built, you can install this version of the CLI using [`gvm`](http://gvmtool.net):
+The `spring` CLI is now installed at `/tmp/spring/spring-boot-cli-1.2.0.BUILD-SNAPSHOT`, so if you are a gvm user you can do this:
 
 ```
-$ gvm install springboot dev spring-boot-cli/target/spring-boot-cli-1.1.0.BUILD-SNAPSHOT-bin/spring-1.1.0.BUILD-SNAPSHOT
-$ gvm use springboot dev
+$ gvm install springboot ratpack `pwd`/spring-boot-cli-1.2.0.BUILD-SNAPSHOT
+$ gvm use springboot ratpack
 ```
+
+and then you can install the `spring-boot-ratpack-cli` jar:
+
+```
+$ cd spring-boot-ratpack
+$ cp spring-boot-ratpack-cli/target/*.jar /tmp/spring/spring-boot-cli-1.2.0.BUILD-SNAPSHOT/lib
+```
+
