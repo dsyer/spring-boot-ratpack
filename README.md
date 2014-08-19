@@ -101,10 +101,9 @@ $ cd spring-boot-ratpack
 $ mvn install
 ```
 
-Once it is built, you can install the ratpack plugin by copying its
-jar file to the CLI lib directory. You either need to build Spring
-Boot or download a snapshot build of the CLI first, e.g. using
-[`gvm`](http://gvmtool.net):
+Once it is built, you can install the ratpack plugin. You either need
+to build Spring Boot or download a snapshot build of the CLI first,
+e.g.
 
 ```
 $ mkdir -p /tmp/spring && cd $_
@@ -122,7 +121,6 @@ $ gvm use springboot ratpack
 and then you can install the `spring-boot-ratpack-cli` jar:
 
 ```
-$ cd spring-boot-ratpack
-$ cp spring-boot-ratpack-cli/target/*.jar /tmp/spring/spring-boot-cli-1.2.0.BUILD-SNAPSHOT/lib
+$ spring install org.springframework.boot:spring-boot-ratpack-cli:1.0.0.BUILD-SNAPSHOT
 ```
 
