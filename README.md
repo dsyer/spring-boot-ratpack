@@ -114,7 +114,7 @@ $ tar -zxf spring.tgz
 The `spring` CLI is now installed at `/tmp/spring/spring-boot-cli-1.2.0.BUILD-SNAPSHOT`, so if you are a gvm user you can do this:
 
 ```
-$ gvm install springboot ratpack `pwd`/spring-boot-cli-1.2.0.BUILD-SNAPSHOT
+$ gvm install springboot ratpack /tmp/spring/spring-boot-cli-1.2.0.BUILD-SNAPSHOT
 $ gvm use springboot ratpack
 ```
 
