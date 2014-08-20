@@ -1,2 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-ratpack.spring.annotation.RatpackAutoConfiguration
+ratpack.spring.annotation.RatpackAutoConfiguration,\
+ratpack.spring.annotation.RatpackManagementAutoConfiguration

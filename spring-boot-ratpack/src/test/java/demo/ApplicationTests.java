@@ -16,27 +16,41 @@ import org.springframework.boot.test.TestRestTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import ratpack.func.Action;
+import ratpack.handling.Chain;
 import ratpack.handling.Context;
 import ratpack.handling.Handler;
+import ratpack.server.RatpackServer;
 import ratpack.spring.annotation.EnableRatpack;
 import demo.ApplicationTests.Application;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
-@IntegrationTest
-@DirtiesContext
+@IntegrationTest({"debug=true", "server.port=0"})
 public class ApplicationTests {
 
 	private TestRestTemplate restTemplate = new TestRestTemplate();
+	
+	@Autowired
+	private RatpackServer server;
 
 	@Test
 	public void contextLoads() {
 		assertEquals("{\"message\":\"Hello World\"}",
-				restTemplate.getForObject("http://localhost:5050/", String.class));
+				restTemplate.getForObject("http://localhost:" + server.getBindPort(),
+						String.class));
+	}
+
+	@Test
+	public void managementEndpoints() {
+		ResponseEntity<String> result = restTemplate.getForEntity(
+				"http://localhost:" + server.getBindPort() + "/dump", String.class);
+		assertEquals(HttpStatus.OK, result.getStatusCode());
 	}
 
 	@ComponentScan
@@ -49,14 +63,20 @@ public class ApplicationTests {
 		private MessageService service;
 
 		@Bean
-		public Handler handler() {
-			return new Handler() {
+		public Action<Chain> handler() {
+			return new Action<Chain>() {
 				@Override
-				public void handle(Context context) throws Exception {
-					context.render(json(Collections.singletonMap("message",
-							service.message())));
+				public void execute(Chain chain) throws Exception {
+					chain.get(new Handler() {
+						@Override
+						public void handle(Context context) throws Exception {
+							context.render(json(Collections.singletonMap(
+									"message", service.message())));
+						}
+					});
 				}
 			};
+
 		}
 
 		public static void main(String[] args) throws Exception {

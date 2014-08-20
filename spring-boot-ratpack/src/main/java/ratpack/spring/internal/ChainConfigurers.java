@@ -16,6 +16,7 @@
 
 package ratpack.spring.internal;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -53,10 +54,14 @@ public class ChainConfigurers implements Action<Chain> {
 	}
 
 	public void execute(Chain chain) throws Exception {
+		List<Action<Chain>> delegates = new ArrayList<Action<Chain>>(this.delegates);
 		if (delegates.isEmpty()) {
 			delegates = ratpackScriptBacking().getHandlerActions();
 		}
-		if (delegates.isEmpty()) {
+		if (handlers.size() == 1) {
+			delegates.add(singleHandlerAction());
+		}
+		else if (delegates.isEmpty()) {
 			delegates = Arrays.asList(singleHandlerAction());
 		}
 		AnnotationAwareOrderComparator.sort(delegates);
