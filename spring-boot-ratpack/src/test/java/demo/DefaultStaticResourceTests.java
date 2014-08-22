@@ -1,5 +1,6 @@
 package demo;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -10,19 +11,18 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.TestRestTemplate;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import ratpack.func.Action;
-import ratpack.handling.Chain;
 import ratpack.server.RatpackServer;
-import demo.StaticResourceTests.Application;
+import demo.DefaultStaticResourceTests.Application;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
 @IntegrationTest("server.port=0")
-public class StaticResourceTests {
+public class DefaultStaticResourceTests {
 
 	private TestRestTemplate restTemplate = new TestRestTemplate();
 
@@ -31,31 +31,20 @@ public class StaticResourceTests {
 
 	@Test
 	public void contextLoads() {
-		String body = restTemplate.getForObject("http://localhost:" + server.getBindPort() + "/root/main.css", String.class);
-		assertTrue("Wrong body" + body, body.contains("background"));
+		ResponseEntity<String> result = restTemplate.getForEntity(
+				"http://localhost:" + server.getBindPort() + "/main.css",
+				String.class);
+		assertEquals(HttpStatus.OK, result.getStatusCode());
+		assertTrue("Wrong body" + result.getBody(),
+				result.getBody().contains("background: red;"));
 	}
 
 	@Configuration
 	@EnableAutoConfiguration
 	protected static class Application {
-		
-		@Bean
-		public Action<Chain> handlers() {
-			return new Action<Chain>() {
-				@Override
-				public void execute(Chain chain) throws Exception {
-					chain.prefix("root",new Action<Chain>() {	
-						@Override
-						public void execute(Chain chain) throws Exception {chain.assets("root", "index.html"); }
-					});
-				}
-			};
-		}
-
 		public static void main(String[] args) throws Exception {
 			SpringApplication.run(Application.class, args);
 		}
-
 	}
 
 }

@@ -31,7 +31,14 @@ import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import ratpack.func.Action;
 import ratpack.handling.Chain;
 import ratpack.handling.Handler;
+import ratpack.handling.Handlers;
+import ratpack.launch.LaunchConfig;
+import ratpack.path.PathBinder;
+import ratpack.path.PathBinding;
+import ratpack.path.internal.DefaultPathBinding;
 import ratpack.spring.groovy.internal.RatpackScriptActionFactory;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * @author Dave Syer
@@ -64,12 +71,38 @@ public class ChainConfigurers implements Action<Chain> {
 		else if (delegates.isEmpty()) {
 			delegates = Arrays.asList(singleHandlerAction());
 		}
+		delegates.add(staticResourcesAction(chain.getLaunchConfig()));
 		AnnotationAwareOrderComparator.sort(delegates);
 		for (Action<Chain> delegate : delegates) {
 			if (!(delegate instanceof ChainConfigurers)) {
 				delegate.execute(chain);
 			}
 		}
+	}
+
+	private Action<Chain> staticResourcesAction(final LaunchConfig config) {
+		return new Action<Chain>() {
+			@Override
+			public void execute(Chain chain) throws Exception {
+				chain.handler(Handlers.path(
+						new RootBinder(),
+						Handlers.assets(config, "static",
+								Arrays.asList("index.html"))));
+				chain.handler(Handlers.path(
+						new RootBinder(),
+						Handlers.assets(config, "public",
+								Arrays.asList("index.html"))));
+			}
+		};
+	}
+
+	protected static class RootBinder implements PathBinder {
+
+		@Override
+		public PathBinding bind(String path, PathBinding parentBinding) {
+			return new DefaultPathBinding("/" + path, "", ImmutableMap.<String, String>of(), parentBinding);
+		}
+
 	}
 
 	private Action<Chain> singleHandlerAction() {
