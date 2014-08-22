@@ -31,6 +31,7 @@ import java.util.Objects;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
@@ -48,7 +49,7 @@ public class RatpackProperties {
 
 	private Integer sessionTimeout;
 
-	private Resource basedir = new FileSystemResource(".");
+	private Resource basedir = initBaseDir();
 
 	@NotNull
 	private String contextPath = "";
@@ -185,6 +186,22 @@ public class RatpackProperties {
 			throw new IllegalArgumentException(
 					"Could not create file system for resource: " + resource, e);
 		}
+	}
+
+	static Resource initBaseDir() {
+		ClassPathResource classPath = new ClassPathResource("");
+		try {
+			if (classPath.getURL().toString().startsWith("jar:")) {
+				return classPath;
+			}
+		} catch (IOException e) {
+		}
+		FileSystemResource resources = new FileSystemResource(
+				"src/main/resources");
+		if (resources.exists()) {
+			return resources;
+		}
+		return new FileSystemResource(".");
 	}
 
 }
