@@ -33,6 +33,7 @@ import javax.validation.constraints.NotNull;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Dave Syer
@@ -159,7 +160,11 @@ public class RatpackProperties {
 
 		String scheme = uri.getScheme();
 		if (scheme.equals("file")) {
-			return Paths.get(uri);
+			String path = uri.toString().substring("file:".length());
+			if (path.contains("//")) {
+				path = StringUtils.cleanPath(path.replace("//", ""));
+			}
+			return Paths.get(new FileSystemResource(path).getFile().toURI());
 		}
 
 		if (!scheme.equals("jar")) {
