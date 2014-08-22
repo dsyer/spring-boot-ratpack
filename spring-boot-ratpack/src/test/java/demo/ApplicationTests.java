@@ -14,8 +14,8 @@ import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.TestRestTemplate;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -26,7 +26,6 @@ import ratpack.handling.Chain;
 import ratpack.handling.Context;
 import ratpack.handling.Handler;
 import ratpack.server.RatpackServer;
-import ratpack.spring.annotation.EnableRatpack;
 import demo.ApplicationTests.Application;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -53,10 +52,9 @@ public class ApplicationTests {
 		assertEquals(HttpStatus.OK, result.getStatusCode());
 	}
 
-	@ComponentScan
 	@Configuration
 	@EnableAutoConfiguration
-	@EnableRatpack
+	@Import(MessageService.class)
 	protected static class Application {
 
 		@Autowired

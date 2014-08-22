@@ -11,12 +11,9 @@ import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.TestRestTemplate;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import ratpack.file.FileRenderer;
-import ratpack.file.internal.DefaultFileRenderer;
 import ratpack.func.Action;
 import ratpack.handling.Chain;
 import ratpack.server.RatpackServer;
@@ -39,16 +36,9 @@ public class StaticResourceTests {
 		assertTrue("Wrong body" + body, body.contains("background"));
 	}
 
-	@ComponentScan
 	@Configuration
 	@EnableAutoConfiguration
-	@EnableRatpack
 	protected static class Application {
-		
-		@Bean
-		public FileRenderer fileRenderer() {
-			return new DefaultFileRenderer();
-		}
 		
 		@Bean
 		public Action<Chain> handlers() {

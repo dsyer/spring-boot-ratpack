@@ -19,20 +19,16 @@ package ratpack.spring.annotation;
 import java.util.Collection;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.web.HttpMapperProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 
 import ratpack.exec.ExecControl;
@@ -46,11 +42,6 @@ import ratpack.jackson.JsonRenderer;
 import ratpack.jackson.internal.DefaultJsonRenderer;
 import ratpack.jackson.internal.JsonParser;
 import ratpack.launch.LaunchConfig;
-import ratpack.launch.LaunchConfigBuilder;
-import ratpack.server.RatpackServer;
-import ratpack.server.RatpackServerBuilder;
-import ratpack.spring.internal.ChainConfigurers;
-import ratpack.spring.internal.SpringBackedHandlerFactory;
 
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -61,66 +52,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
  * 
  */
 @Configuration
-@Import(ChainConfigurers.class)
-@EnableConfigurationProperties(RatpackProperties.class)
-public class RatpackAutoConfiguration implements CommandLineRunner {
-
-	@Autowired
-	private RatpackServer server;
-
-	@Override
-	public void run(String... args) throws Exception {
-		server.start();
-	}
-
-	@PreDestroy
-	public void stop() throws Exception {
-		server.stop();
-	}
-
-	@Configuration
-	protected static class LaunchConfiguration {
-
-		@Autowired
-		private RatpackProperties ratpack;
-
-		@Bean
-		@ConditionalOnMissingBean
-		public LaunchConfig ratpackLaunchConfig(ApplicationContext context) {
-			// @formatter:off
-			LaunchConfigBuilder builder = LaunchConfigBuilder
-					.baseDir(ratpack.getBasepath())
-					.address(ratpack.getAddress())
-					.threads(ratpack.getMaxThreads());
-			// @formatter:on
-			if (ratpack.getPort() != null) {
-				builder.port(ratpack.getPort());
-			}
-			return builder.build(new SpringBackedHandlerFactory(context));
-		}
-
-	}
-
-	@Configuration
-	@ConditionalOnMissingBean(RatpackServer.class)
-	protected static class ServerConfiguration {
-
-		@Autowired
-		private LaunchConfig launchConfig;
-
-		@Bean
-		public RatpackServer ratpackServer() {
-			RatpackServer server = RatpackServerBuilder.build(launchConfig);
-			return server;
-		}
-		
-		@Bean
-		public ExecControl ratpackExecControl() {
-			return launchConfig.getExecController().getControl();
-		}
-		
-
-	}
+@EnableRatpack
+public class RatpackAutoConfiguration {
 
 	@Configuration
 	@ConditionalOnClass(ObjectMapper.class)
