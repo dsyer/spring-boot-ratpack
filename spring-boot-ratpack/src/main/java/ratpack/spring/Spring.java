@@ -30,14 +30,14 @@ import ratpack.spring.internal.SpringBackedRegistry;
  */
 public abstract class Spring {
 
-	public static Registry registry(ApplicationContext applicationContext) {
+	public static Registry spring(ApplicationContext applicationContext) {
 		return new SpringBackedRegistry(applicationContext);
 	}
 
-	public static Registry run(Class<?>... sources) {
+	public static Registry spring(Class<?>... sources) {
 		SpringApplication springApplication = new SpringApplication(
 				(Object[]) sources);
-		return registry(springApplication.run(new String[0]));
+		return spring(springApplication.run(new String[0]));
 	}
 
 }

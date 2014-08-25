@@ -41,15 +41,19 @@ public class RatpackCompilerAutoConfiguration extends CompilerAutoConfiguration 
 	@Override
 	public void applyDependencies(DependencyCustomizer dependencies)
 			throws CompilationFailedException {
-		dependencies.add("io.ratpack:ratpack-groovy:0.9.7")
-				.add("io.ratpack:ratpack-jackson:0.9.7").add("org.springframework.boot:spring-boot-ratpack:1.0.0.BUILD-SNAPSHOT");
+		dependencies
+				.add("io.ratpack:ratpack-groovy:0.9.7")
+				.add("io.ratpack:ratpack-jackson:0.9.7")
+				.add("org.springframework.boot:spring-boot-ratpack:1.0.0.BUILD-SNAPSHOT");
 
 	}
 
 	@Override
-	public void applyImports(ImportCustomizer imports) throws CompilationFailedException {
-		imports.addStaticStars("ratpack.jackson.Jackson", "ratpack.spring.groovy.Groovy")
-				.addImports("ratpack.spring.annotation.EnableRatpack");
+	public void applyImports(ImportCustomizer imports)
+			throws CompilationFailedException {
+		imports.addStaticStars("ratpack.jackson.Jackson",
+				"ratpack.spring.groovy.Groovy").addImports(
+				"ratpack.spring.annotation.EnableRatpack");
 	}
 
 }

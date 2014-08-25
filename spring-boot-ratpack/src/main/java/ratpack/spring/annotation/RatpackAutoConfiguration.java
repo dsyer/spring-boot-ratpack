@@ -69,14 +69,17 @@ public class RatpackAutoConfiguration {
 		@PostConstruct
 		public void init() {
 			Collection<ObjectMapper> mappers = BeanFactoryUtils
-					.beansOfTypeIncludingAncestors(this.beanFactory, ObjectMapper.class)
-					.values();
-			Collection<Module> modules = BeanFactoryUtils.beansOfTypeIncludingAncestors(
-					this.beanFactory, Module.class).values();
+					.beansOfTypeIncludingAncestors(this.beanFactory,
+							ObjectMapper.class).values();
+			Collection<Module> modules = BeanFactoryUtils
+					.beansOfTypeIncludingAncestors(this.beanFactory,
+							Module.class).values();
 			for (ObjectMapper mapper : mappers) {
 				mapper.registerModules(modules);
-				mapper.configure(SerializationFeature.INDENT_OUTPUT,
-						properties.isJsonPrettyPrint());
+				if (!mapper.isEnabled(SerializationFeature.INDENT_OUTPUT)) {
+					mapper.configure(SerializationFeature.INDENT_OUTPUT,
+							properties.isJsonPrettyPrint());
+				}
 			}
 		}
 
@@ -117,13 +120,15 @@ public class RatpackAutoConfiguration {
 		@Bean
 		@ConditionalOnMissingBean
 		public TemplateRenderer groovyTemplateRenderer() {
-			return new TemplateRenderer(groovyTemplateRenderingEngine(), launchConfig.getBufferAllocator());
+			return new TemplateRenderer(groovyTemplateRenderingEngine(),
+					launchConfig.getBufferAllocator());
 		}
 
 		@Bean
 		@ConditionalOnMissingBean
 		public GroovyTemplateRenderingEngine groovyTemplateRenderingEngine() {
-			return new GroovyTemplateRenderingEngine(launchConfig, templatingConfig(), execControl);
+			return new GroovyTemplateRenderingEngine(launchConfig,
+					templatingConfig(), execControl);
 		}
 
 		@Bean
@@ -131,20 +136,24 @@ public class RatpackAutoConfiguration {
 		public TemplatingConfig templatingConfig() {
 			return new DefaultTemplatingConfig(ratpack.getTemplatesPath(),
 					ratpack.getCacheSize(), ratpack.isReloadable()
-							|| launchConfig.isReloadable(), ratpack.isStaticallyCompile());
+							|| launchConfig.isReloadable(),
+					ratpack.isStaticallyCompile());
 		}
 
 		@Bean
 		protected TemplateRenderingClientErrorHandler clientErrorHandler() {
-			return new TemplateRenderingClientErrorHandler(launchConfig.getBufferAllocator(), groovyTemplateRenderingEngine());
+			return new TemplateRenderingClientErrorHandler(
+					launchConfig.getBufferAllocator(),
+					groovyTemplateRenderingEngine());
 		}
 
 		@Bean
 		protected TemplateRenderingServerErrorHandler serverErrorHandler() {
-			return new TemplateRenderingServerErrorHandler(launchConfig.getBufferAllocator(), groovyTemplateRenderingEngine());
+			return new TemplateRenderingServerErrorHandler(
+					launchConfig.getBufferAllocator(),
+					groovyTemplateRenderingEngine());
 		}
 
 	}
-
 
 }
