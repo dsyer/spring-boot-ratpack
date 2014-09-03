@@ -58,7 +58,7 @@ public class RatpackProperties {
 
 	private String templatesPath = "templates";
 	private int cacheSize = 100;
-	private boolean reloadable;
+	private boolean development;
 	private boolean staticallyCompile;
 
 	public String getTemplatesPath() {
@@ -77,12 +77,12 @@ public class RatpackProperties {
 		this.cacheSize = cacheSize;
 	}
 
-	public boolean isReloadable() {
-		return reloadable;
+	public boolean isDevelopment() {
+		return development;
 	}
 
-	public void setReloadable(boolean reloadable) {
-		this.reloadable = reloadable;
+	public void setDevelopment(boolean development) {
+		this.development = development;
 	}
 
 	public boolean isStaticallyCompile() {

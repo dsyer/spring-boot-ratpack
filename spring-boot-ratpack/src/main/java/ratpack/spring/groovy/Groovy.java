@@ -129,7 +129,7 @@ public abstract class Groovy {
 			@DelegatesTo(value = GroovyChain.class, strategy = Closure.DELEGATE_FIRST) Closure<?> closure)
 			throws Exception {
 		return ChainBuilders.build(
-				launchConfig != null && launchConfig.isReloadable(),
+				launchConfig != null && launchConfig.isDevelopment(),
 				new GroovyDslChainActionTransformer(launchConfig, registry),
 				new ClosureInvoker<Object, GroovyChain>(closure).toAction(
 						registry, Closure.DELEGATE_FIRST));

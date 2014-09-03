@@ -135,8 +135,8 @@ public class RatpackAutoConfiguration {
 		@ConditionalOnMissingBean
 		public TemplatingConfig templatingConfig() {
 			return new DefaultTemplatingConfig(ratpack.getTemplatesPath(),
-					ratpack.getCacheSize(), ratpack.isReloadable()
-							|| launchConfig.isReloadable(),
+					ratpack.getCacheSize(), ratpack.isDevelopment()
+							|| launchConfig.isDevelopment(),
 					ratpack.isStaticallyCompile());
 		}
 
