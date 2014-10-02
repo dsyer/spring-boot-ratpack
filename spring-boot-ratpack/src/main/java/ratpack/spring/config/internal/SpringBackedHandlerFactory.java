@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ratpack.spring.internal;
+package ratpack.spring.config.internal;
 
 import org.springframework.context.ApplicationContext;
 
@@ -25,6 +25,7 @@ import ratpack.handling.internal.ClientErrorForwardingHandler;
 import ratpack.launch.HandlerFactory;
 import ratpack.launch.LaunchConfig;
 import ratpack.registry.Registry;
+import ratpack.spring.Spring;
 
 /**
  * @author Dave Syer
@@ -40,7 +41,7 @@ public class SpringBackedHandlerFactory implements HandlerFactory {
 
 	@Override
 	public Handler create(LaunchConfig launchConfig) throws Exception {
-		SpringBackedRegistry registry = new SpringBackedRegistry(context);
+		Registry registry = Spring.spring(context);
 		return Handlers.chain(
 				new RegistryHandler(registry, Handlers.chain(launchConfig, registry,
 						registry.get(ChainConfigurers.class))),

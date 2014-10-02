@@ -32,8 +32,8 @@ import ratpack.launch.LaunchConfig;
 import ratpack.launch.LaunchConfigBuilder;
 import ratpack.server.RatpackServer;
 import ratpack.server.RatpackServerBuilder;
-import ratpack.spring.internal.ChainConfigurers;
-import ratpack.spring.internal.SpringBackedHandlerFactory;
+import ratpack.spring.config.internal.ChainConfigurers;
+import ratpack.spring.config.internal.SpringBackedHandlerFactory;
 
 /**
  * @author Dave Syer

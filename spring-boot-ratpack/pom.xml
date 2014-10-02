@@ -27,10 +27,21 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-jasper-el</artifactId>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>io.ratpack</groupId>
 			<artifactId>ratpack-core</artifactId>
+			<version>${ratpack.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.ratpack</groupId>
+			<artifactId>ratpack-spring-boot</artifactId>
 			<version>${ratpack.version}</version>
 		</dependency>
 		<dependency>
@@ -42,6 +53,7 @@
 			<groupId>io.ratpack</groupId>
 			<artifactId>ratpack-groovy</artifactId>
 			<version>${ratpack.version}</version>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -58,8 +70,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>1.7</java.version>
-        <ratpack.version>0.9.8</ratpack.version>
+        <java.version>1.8</java.version>
+        <ratpack.version>0.9.9</ratpack.version>
 	</properties>
 
 </project>

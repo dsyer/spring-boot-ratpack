@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ratpack.spring.internal;
+package ratpack.spring.config.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;

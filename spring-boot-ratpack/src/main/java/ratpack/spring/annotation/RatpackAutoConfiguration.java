@@ -36,8 +36,6 @@ import ratpack.groovy.templating.TemplatingConfig;
 import ratpack.groovy.templating.internal.DefaultTemplatingConfig;
 import ratpack.groovy.templating.internal.GroovyTemplateRenderingEngine;
 import ratpack.groovy.templating.internal.TemplateRenderer;
-import ratpack.groovy.templating.internal.TemplateRenderingClientErrorHandler;
-import ratpack.groovy.templating.internal.TemplateRenderingServerErrorHandler;
 import ratpack.jackson.JsonRenderer;
 import ratpack.jackson.internal.DefaultJsonRenderer;
 import ratpack.jackson.internal.JsonParser;
@@ -138,20 +136,6 @@ public class RatpackAutoConfiguration {
 					ratpack.getCacheSize(), ratpack.isDevelopment()
 							|| launchConfig.isDevelopment(),
 					ratpack.isStaticallyCompile());
-		}
-
-		@Bean
-		protected TemplateRenderingClientErrorHandler clientErrorHandler() {
-			return new TemplateRenderingClientErrorHandler(
-					launchConfig.getBufferAllocator(),
-					groovyTemplateRenderingEngine());
-		}
-
-		@Bean
-		protected TemplateRenderingServerErrorHandler serverErrorHandler() {
-			return new TemplateRenderingServerErrorHandler(
-					launchConfig.getBufferAllocator(),
-					groovyTemplateRenderingEngine());
 		}
 
 	}
