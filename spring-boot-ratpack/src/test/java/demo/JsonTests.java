@@ -28,6 +28,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import ratpack.func.Action;
+import ratpack.func.NoArgAction;
 import ratpack.handling.ByMethodSpec;
 import ratpack.handling.Chain;
 import ratpack.handling.Context;
@@ -59,9 +60,8 @@ public class JsonTests {
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		HttpEntity<Map<String, String>> entity = new HttpEntity<Map<String, String>>(
 				Collections.singletonMap("foo", "bar"), headers);
-		ResponseEntity<String> result = restTemplate.postForEntity(
-				"http://localhost:" + server.getBindPort(), entity,
-				String.class);
+		ResponseEntity<String> result = restTemplate.postForEntity("http://localhost:"
+				+ server.getBindPort(), entity, String.class);
 		assertEquals(HttpStatus.OK, result.getStatusCode());
 		String body = restTemplate.getForObject(
 				"http://localhost:" + server.getBindPort(), String.class);
@@ -93,19 +93,16 @@ public class JsonTests {
 					context.byMethod(new Action<ByMethodSpec>() {
 						@Override
 						public void execute(ByMethodSpec spec) throws Exception {
-							spec.get(new Handler() {
+							spec.get(new NoArgAction() {
 								@Override
-								public void handle(Context context)
-										throws Exception {
+								public void execute() throws Exception {
 									context.render(json(map));
 								}
-							}).post(new Handler() {
+							}).post(new NoArgAction() {
 								@SuppressWarnings("unchecked")
 								@Override
-								public void handle(Context context)
-										throws Exception {
-									map.putAll(context
-											.parse(fromJson(Map.class)));
+								public void execute() throws Exception {
+									map.putAll(context.parse(fromJson(Map.class)));
 									context.render(json(map));
 								}
 							});

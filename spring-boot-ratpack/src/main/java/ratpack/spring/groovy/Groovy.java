@@ -30,11 +30,9 @@ import ratpack.groovy.handling.internal.ClosureBackedHandler;
 import ratpack.groovy.handling.internal.DefaultGroovyContext;
 import ratpack.groovy.handling.internal.GroovyDslChainActionTransformer;
 import ratpack.groovy.internal.ClosureInvoker;
-import ratpack.groovy.markup.Markup;
-import ratpack.groovy.markup.internal.DefaultMarkup;
-import ratpack.groovy.markuptemplates.MarkupTemplate;
-import ratpack.groovy.templating.Template;
-import ratpack.groovy.templating.internal.DefaultTemplate;
+import ratpack.groovy.template.Markup;
+import ratpack.groovy.template.MarkupTemplate;
+import ratpack.groovy.template.TextTemplate;
 import ratpack.handling.Context;
 import ratpack.handling.Handler;
 import ratpack.handling.internal.ChainBuilders;
@@ -131,7 +129,7 @@ public abstract class Groovy {
 	 * @param id The id/name of the template
 	 * @return a template
 	 */
-	public static Template groovyTemplate(String id) {
+	public static TextTemplate groovyTemplate(String id) {
 		return groovyTemplate(id, null);
 	}
 
@@ -143,7 +141,7 @@ public abstract class Groovy {
 	 * @param type The content type of template
 	 * @return a template
 	 */
-	public static Template groovyTemplate(String id, String type) {
+	public static TextTemplate groovyTemplate(String id, String type) {
 		return groovyTemplate(ImmutableMap.<String, Object> of(), id, type);
 	}
 
@@ -155,7 +153,7 @@ public abstract class Groovy {
 	 * @param id The id/name of the template
 	 * @return a template
 	 */
-	public static Template groovyTemplate(Map<String, ?> model, String id) {
+	public static TextTemplate groovyTemplate(Map<String, ?> model, String id) {
 		return groovyTemplate(model, id, null);
 	}
 
@@ -203,8 +201,8 @@ public abstract class Groovy {
 	 * @param type The content type of template
 	 * @return a template
 	 */
-	public static Template groovyTemplate(Map<String, ?> model, String id, String type) {
-		return new DefaultTemplate(id, model, type);
+	public static TextTemplate groovyTemplate(Map<String, ?> model, String id, String type) {
+		return new TextTemplate(model, id, type);
 	}
 
 	/**
@@ -269,15 +267,14 @@ public abstract class Groovy {
 			CharSequence contentType,
 			CharSequence encoding,
 			@DelegatesTo(value = MarkupBuilder.class, strategy = Closure.DELEGATE_FIRST) Closure<?> closure) {
-		return new DefaultMarkup(contentType, Charset.forName(encoding.toString()),
-				closure);
+		return new Markup(contentType, Charset.forName(encoding.toString()), closure);
 	}
 
 	public static Markup markupBuilder(
 			CharSequence contentType,
 			Charset encoding,
 			@DelegatesTo(value = MarkupBuilder.class, strategy = Closure.DELEGATE_FIRST) Closure<?> closure) {
-		return new DefaultMarkup(contentType, encoding, closure);
+		return new Markup(contentType, encoding, closure);
 	}
 
 }

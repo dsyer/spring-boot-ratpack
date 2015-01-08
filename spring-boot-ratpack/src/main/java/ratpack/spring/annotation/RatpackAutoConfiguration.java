@@ -25,20 +25,17 @@ import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.web.HttpMapperProperties;
+import org.springframework.boot.autoconfigure.jackson.JacksonProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 import ratpack.exec.ExecControl;
-import ratpack.groovy.templating.TemplatingConfig;
-import ratpack.groovy.templating.internal.DefaultTemplatingConfig;
-import ratpack.groovy.templating.internal.GroovyTemplateRenderingEngine;
-import ratpack.groovy.templating.internal.TemplateRenderer;
-import ratpack.jackson.JsonRenderer;
-import ratpack.jackson.internal.DefaultJsonRenderer;
+import ratpack.groovy.template.internal.TextTemplateRenderer;
+import ratpack.groovy.template.internal.TextTemplateRenderingEngine;
 import ratpack.jackson.internal.JsonParser;
+import ratpack.jackson.internal.JsonRenderer;
 import ratpack.launch.LaunchConfig;
 
 import com.fasterxml.jackson.databind.Module;
@@ -55,11 +52,11 @@ public class RatpackAutoConfiguration {
 
 	@Configuration
 	@ConditionalOnClass(ObjectMapper.class)
-	@EnableConfigurationProperties(HttpMapperProperties.class)
+	@EnableConfigurationProperties(JacksonProperties.class)
 	protected static class ObjectMappers {
 
 		@Autowired
-		private HttpMapperProperties properties = new HttpMapperProperties();
+		private JacksonProperties properties = new JacksonProperties();
 
 		@Autowired
 		private ListableBeanFactory beanFactory;
@@ -67,16 +64,18 @@ public class RatpackAutoConfiguration {
 		@PostConstruct
 		public void init() {
 			Collection<ObjectMapper> mappers = BeanFactoryUtils
-					.beansOfTypeIncludingAncestors(this.beanFactory,
-							ObjectMapper.class).values();
-			Collection<Module> modules = BeanFactoryUtils
-					.beansOfTypeIncludingAncestors(this.beanFactory,
-							Module.class).values();
+					.beansOfTypeIncludingAncestors(this.beanFactory, ObjectMapper.class)
+					.values();
+			Collection<Module> modules = BeanFactoryUtils.beansOfTypeIncludingAncestors(
+					this.beanFactory, Module.class).values();
 			for (ObjectMapper mapper : mappers) {
 				mapper.registerModules(modules);
 				if (!mapper.isEnabled(SerializationFeature.INDENT_OUTPUT)) {
-					mapper.configure(SerializationFeature.INDENT_OUTPUT,
-							properties.isJsonPrettyPrint());
+					Boolean prettyPrint = properties.getSerialization().get(
+							SerializationFeature.INDENT_OUTPUT);
+					if (prettyPrint != null) {
+						mapper.configure(SerializationFeature.INDENT_OUTPUT, prettyPrint);
+					}
 				}
 			}
 		}
@@ -91,7 +90,7 @@ public class RatpackAutoConfiguration {
 		@Bean
 		@ConditionalOnMissingBean
 		public JsonRenderer jsonRenderer() {
-			return new DefaultJsonRenderer(jacksonObjectMapper().writer());
+			return new JsonRenderer(jacksonObjectMapper().writer());
 		}
 
 		@Bean
@@ -103,7 +102,7 @@ public class RatpackAutoConfiguration {
 	}
 
 	@Configuration
-	@ConditionalOnClass(GroovyTemplateRenderingEngine.class)
+	@ConditionalOnClass(TextTemplateRenderingEngine.class)
 	protected static class GroovyTemplateConfiguration {
 
 		@Autowired
@@ -117,23 +116,16 @@ public class RatpackAutoConfiguration {
 
 		@Bean
 		@ConditionalOnMissingBean
-		public TemplateRenderer groovyTemplateRenderer() {
-			return new TemplateRenderer(groovyTemplateRenderingEngine(),
-					launchConfig.getBufferAllocator());
+		public TextTemplateRenderer groovyTemplateRenderer() {
+			return new TextTemplateRenderer(groovyTemplateRenderingEngine());
 		}
 
 		@Bean
 		@ConditionalOnMissingBean
-		public GroovyTemplateRenderingEngine groovyTemplateRenderingEngine() {
-			return new GroovyTemplateRenderingEngine(launchConfig,
-					templatingConfig(), execControl);
-		}
-
-		@Bean
-		@ConditionalOnMissingBean
-		public TemplatingConfig templatingConfig() {
-			return new DefaultTemplatingConfig(ratpack.getTemplatesPath(),
-					ratpack.getCacheSize(), ratpack.isDevelopment()
+		public TextTemplateRenderingEngine groovyTemplateRenderingEngine() {
+			return new TextTemplateRenderingEngine(execControl,
+					launchConfig.getBufferAllocator(), launchConfig.getBaseDir().binding(
+							ratpack.getTemplatesPath()), ratpack.isDevelopment()
 							|| launchConfig.isDevelopment(),
 					ratpack.isStaticallyCompile());
 		}
