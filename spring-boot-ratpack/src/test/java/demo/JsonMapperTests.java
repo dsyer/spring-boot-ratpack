@@ -27,10 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import ratpack.func.Action;
-import ratpack.func.NoArgAction;
-import ratpack.handling.ByMethodSpec;
 import ratpack.handling.Chain;
-import ratpack.handling.Context;
 import ratpack.handling.Handler;
 import ratpack.server.RatpackServer;
 
@@ -90,39 +87,22 @@ public class JsonMapperTests {
 
 		@Bean
 		public Action<Chain> chain() {
-			return new Action<Chain>() {
-				@Override
-				public void execute(Chain chain) throws Exception {
-					chain.handler(handler());
-				}
-			};
+			return chain -> chain.handler(handler());
 		}
 
 		@Bean
 		public Handler handler() {
-			return new Handler() {
-
-				@Override
-				public void handle(Context context) throws Exception {
-					context.byMethod(new Action<ByMethodSpec>() {
-						@Override
-						public void execute(ByMethodSpec spec) throws Exception {
-							spec.get(new NoArgAction() {
-								@Override
-								public void execute() throws Exception {
-									context.render(json(point));
-								}
-							}).post(new NoArgAction() {
-								@Override
-								public void execute() throws Exception {
-									point = context.parse(fromJson(Point.class));
-									context.render(json(point));
-								}
-							});
-						}
-					});
-
-				}
+			return context -> {
+				context.byMethod(spec -> {
+					// @formatter:off	
+					spec
+						.get(() -> context.render(json(point)))
+						.post(() -> {
+							point = context.parse(fromJson(Point.class));
+							context.render(json(point));
+						});
+					// @formatter:on
+				});
 			};
 		}
 

@@ -23,32 +23,29 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import ratpack.func.Action;
 import ratpack.handling.Chain;
-import ratpack.handling.Context;
-import ratpack.handling.Handler;
 import ratpack.server.RatpackServer;
 import demo.ApplicationTests.Application;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
-@IntegrationTest({"debug=true", "server.port=0"})
+@IntegrationTest({ "debug=true", "server.port=0" })
 public class ApplicationTests {
 
 	private TestRestTemplate restTemplate = new TestRestTemplate();
-	
+
 	@Autowired
 	private RatpackServer server;
 
 	@Test
 	public void contextLoads() {
-		assertEquals("{\"message\":\"Hello World\"}",
-				restTemplate.getForObject("http://localhost:" + server.getBindPort(),
-						String.class));
+		assertEquals("{\"message\":\"Hello World\"}", restTemplate.getForObject(
+				"http://localhost:" + server.getBindPort(), String.class));
 	}
 
 	@Test
 	public void managementEndpoints() {
-		ResponseEntity<String> result = restTemplate.getForEntity(
-				"http://localhost:" + server.getBindPort() + "/dump", String.class);
+		ResponseEntity<String> result = restTemplate.getForEntity("http://localhost:"
+				+ server.getBindPort() + "/dump", String.class);
 		assertEquals(HttpStatus.OK, result.getStatusCode());
 	}
 
@@ -62,19 +59,8 @@ public class ApplicationTests {
 
 		@Bean
 		public Action<Chain> handler() {
-			return new Action<Chain>() {
-				@Override
-				public void execute(Chain chain) throws Exception {
-					chain.get(new Handler() {
-						@Override
-						public void handle(Context context) throws Exception {
-							context.render(json(Collections.singletonMap(
-									"message", service.message())));
-						}
-					});
-				}
-			};
-
+			return chain -> chain.get(context -> context.render(json(Collections
+					.singletonMap("message", service.message()))));
 		}
 
 		public static void main(String[] args) throws Exception {

@@ -28,10 +28,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import ratpack.func.Action;
-import ratpack.func.NoArgAction;
-import ratpack.handling.ByMethodSpec;
 import ratpack.handling.Chain;
-import ratpack.handling.Context;
 import ratpack.handling.Handler;
 import ratpack.server.RatpackServer;
 import demo.JsonTests.Application;
@@ -76,41 +73,17 @@ public class JsonTests {
 
 		@Bean
 		public Action<Chain> chain() {
-			return new Action<Chain>() {
-				@Override
-				public void execute(Chain chain) throws Exception {
-					chain.handler(handler());
-				}
-			};
+			return chain -> chain.handler(handler());
 		}
 
+		@SuppressWarnings("unchecked")
 		@Bean
 		public Handler handler() {
-			return new Handler() {
-
-				@Override
-				public void handle(Context context) throws Exception {
-					context.byMethod(new Action<ByMethodSpec>() {
-						@Override
-						public void execute(ByMethodSpec spec) throws Exception {
-							spec.get(new NoArgAction() {
-								@Override
-								public void execute() throws Exception {
-									context.render(json(map));
-								}
-							}).post(new NoArgAction() {
-								@SuppressWarnings("unchecked")
-								@Override
-								public void execute() throws Exception {
-									map.putAll(context.parse(fromJson(Map.class)));
-									context.render(json(map));
-								}
-							});
-						}
-					});
-
-				}
-			};
+			return context -> context.byMethod(spec -> spec.get(
+					() -> context.render(json(map))).post(() -> {
+				map.putAll(context.parse(fromJson(Map.class)));
+				context.render(json(map));
+			}));
 		}
 
 		public static void main(String[] args) throws Exception {
