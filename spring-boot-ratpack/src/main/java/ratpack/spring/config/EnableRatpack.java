@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ratpack.spring.annotation;
+package ratpack.spring.config;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ratpack.spring.annotation;
+package ratpack.spring.config;
 
 import javax.annotation.PreDestroy;
 
@@ -27,7 +27,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
-import ratpack.exec.ExecControl;
 import ratpack.launch.LaunchConfig;
 import ratpack.launch.LaunchConfigBuilder;
 import ratpack.server.RatpackServer;
@@ -93,12 +92,6 @@ public class RatpackConfiguration implements CommandLineRunner {
 			return server;
 		}
 		
-		@Bean
-		public ExecControl ratpackExecControl() {
-			return launchConfig.getExecController().getControl();
-		}
-		
-
 	}
 
 }

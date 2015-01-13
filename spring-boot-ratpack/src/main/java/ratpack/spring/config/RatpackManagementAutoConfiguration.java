@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ratpack.spring.annotation;
+package ratpack.spring.config;
 
 import java.util.Collections;
 import java.util.List;
@@ -87,7 +87,6 @@ public class RatpackManagementAutoConfiguration {
 					chain.get(prefix + endpoint.getId(), new Handler() {
 						@Override
 						public void handle(Context context) throws Exception {
-							// TODO: content types?
 							context.render(Jackson.json(point.invoke()));
 						}
 					});

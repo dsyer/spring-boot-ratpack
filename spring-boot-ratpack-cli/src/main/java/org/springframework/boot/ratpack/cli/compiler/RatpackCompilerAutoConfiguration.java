@@ -52,8 +52,8 @@ public class RatpackCompilerAutoConfiguration extends CompilerAutoConfiguration 
 	public void applyImports(ImportCustomizer imports)
 			throws CompilationFailedException {
 		imports.addStaticStars("ratpack.jackson.Jackson",
-				"ratpack.spring.groovy.Groovy").addImports(
-				"ratpack.spring.annotation.EnableRatpack");
+				"ratpack.groovy.Groovy").addImports(
+				"ratpack.spring.config.EnableRatpack");
 	}
 
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ratpack.spring.annotation;
+package ratpack.spring.config;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -30,6 +30,7 @@ import java.util.Objects;
 
 import javax.validation.constraints.NotNull;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
@@ -40,9 +41,10 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * 
  */
-@ConfigurationProperties(prefix = "server", ignoreUnknownFields = false)
+@ConfigurationProperties(prefix = "ratpack", ignoreUnknownFields = false)
 public class RatpackProperties {
 
+	@Value("#{environment.getProperty('server.port')}")
 	private Integer port;
 
 	private InetAddress address;
