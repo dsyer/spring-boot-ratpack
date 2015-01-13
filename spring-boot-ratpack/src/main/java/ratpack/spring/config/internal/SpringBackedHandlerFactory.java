@@ -18,6 +18,8 @@ package ratpack.spring.config.internal;
 
 import org.springframework.context.ApplicationContext;
 
+import ratpack.func.Action;
+import ratpack.guice.BindingsSpec;
 import ratpack.guice.Guice;
 import ratpack.handling.Handler;
 import ratpack.handling.Handlers;
@@ -26,6 +28,7 @@ import ratpack.launch.HandlerFactory;
 import ratpack.launch.LaunchConfig;
 import ratpack.registry.Registry;
 import ratpack.spring.Spring;
+import ratpack.spring.groovy.internal.RatpackScriptActionFactory;
 
 import com.google.inject.Module;
 
@@ -44,10 +47,12 @@ public class SpringBackedHandlerFactory implements HandlerFactory {
 	@Override
 	public Handler create(LaunchConfig launchConfig) throws Exception {
 		Registry registry = Spring.spring(context);
+		Action<BindingsSpec> action = registry.get(RatpackScriptActionFactory.class).getBindings();
 		Handler handler = Guice.builder(launchConfig).bindings(bindings -> {
 			for (Module module : registry.getAll(Module.class)) {
 				bindings.add(module);
 			}
+			action.execute(bindings);
 		}).build(registry.get(ChainConfigurers.class));
 		return Handlers.chain(Handlers.register(registry, handler),
 				new ClientErrorForwardingHandler(404));

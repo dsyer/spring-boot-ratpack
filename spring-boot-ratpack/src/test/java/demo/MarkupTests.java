@@ -1,7 +1,7 @@
 package demo;
 
 import static org.junit.Assert.assertTrue;
-import static ratpack.groovy.Groovy.groovyTemplate;
+import static ratpack.groovy.Groovy.groovyMarkupTemplate;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,12 +18,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import ratpack.handling.Context;
 import ratpack.handling.Handler;
 import ratpack.server.RatpackServer;
-import demo.TemplateTests.Application;
+import demo.MarkupTests.Application;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
 @IntegrationTest("server.port=0")
-public class TemplateTests {
+public class MarkupTests {
 
 	private TestRestTemplate restTemplate = new TestRestTemplate();
 
@@ -39,13 +39,13 @@ public class TemplateTests {
 	@Configuration
 	@EnableAutoConfiguration
 	protected static class Application {
-
+		
 		@Bean
 		public Handler handler() {
 			return new Handler() {
 				@Override
 				public void handle(Context context) throws Exception {
-					context.render(groovyTemplate("index.html"));
+					context.render(groovyMarkupTemplate("markup.html"));
 				}
 			};
 		}

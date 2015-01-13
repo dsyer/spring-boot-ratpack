@@ -25,10 +25,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import ratpack.func.Action;
+import ratpack.groovy.Groovy;
+import ratpack.groovy.guice.internal.DefaultGroovyBindingsSpec;
 import ratpack.groovy.handling.internal.DefaultGroovyChain;
 import ratpack.groovy.internal.ClosureUtil;
+import ratpack.guice.BindingsSpec;
 import ratpack.handling.Chain;
-import ratpack.spring.groovy.Groovy;
 
 /**
  * @author Dave Syer
@@ -36,8 +38,8 @@ import ratpack.spring.groovy.Groovy;
  */
 @Component
 public class RatpackScriptActionFactory {
-	
-	@Autowired(required=false)
+
+	@Autowired(required = false)
 	private GroovyRatpackSource source;
 
 	protected interface GroovyRatpackSource {
@@ -47,28 +49,46 @@ public class RatpackScriptActionFactory {
 	static class RatpackImpl implements Groovy.Ratpack {
 
 		private Closure<?> handlersConfigurer;
+		private Closure<?> bindingsConfigurer;
 
 		public void handlers(Closure<?> handlersConfigurer) {
 			this.handlersConfigurer = handlersConfigurer;
+		}
+
+		@Override
+		public void bindings(Closure<?> bindingsConfigurer) {
+			this.bindingsConfigurer = bindingsConfigurer;
 		}
 
 	}
 
 	public List<Action<Chain>> getHandlerActions() {
 
-		if (source==null) {
+		if (source == null) {
 			return Collections.emptyList();
 		}
 
 		final RatpackImpl ratpack = new RatpackImpl();
-	    ClosureUtil.configureDelegateFirst(ratpack, source.getRatpack());
+		ClosureUtil.configureDelegateFirst(ratpack, source.getRatpack());
 
-	    return Collections.<Action<Chain>>singletonList(new Action<Chain>() {
-			@Override
-			public void execute(Chain chain) throws Exception {
-				ClosureUtil.configureDelegateFirst(new DefaultGroovyChain(chain), ratpack.handlersConfigurer);
-			}
-		});
+		return Collections.<Action<Chain>> singletonList(chain -> ClosureUtil
+				.configureDelegateFirst(new DefaultGroovyChain(chain),
+						ratpack.handlersConfigurer));
+
+	}
+
+	public Action<BindingsSpec> getBindings() {
+
+		if (source == null) {
+			return binding -> {
+			};
+		}
+
+		final RatpackImpl ratpack = new RatpackImpl();
+		ClosureUtil.configureDelegateFirst(ratpack, source.getRatpack());
+
+		return binding -> ClosureUtil.delegatingAction(ratpack.bindingsConfigurer)
+				.execute(new DefaultGroovyBindingsSpec(binding));
 
 	}
 
