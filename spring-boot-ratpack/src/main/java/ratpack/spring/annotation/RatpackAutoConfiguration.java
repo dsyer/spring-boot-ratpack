@@ -16,12 +16,9 @@
 
 package ratpack.spring.annotation;
 
-import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
-import javax.annotation.PostConstruct;
-
-import org.springframework.beans.factory.BeanFactoryUtils;
-import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -29,14 +26,10 @@ import org.springframework.boot.autoconfigure.jackson.JacksonProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 
-import ratpack.exec.ExecControl;
-import ratpack.groovy.template.internal.TextTemplateRenderer;
+import ratpack.groovy.template.TextTemplateModule;
 import ratpack.groovy.template.internal.TextTemplateRenderingEngine;
-import ratpack.jackson.internal.JsonParser;
-import ratpack.jackson.internal.JsonRenderer;
-import ratpack.launch.LaunchConfig;
+import ratpack.jackson.JacksonModule;
 
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -58,45 +51,22 @@ public class RatpackAutoConfiguration {
 		@Autowired
 		private JacksonProperties properties = new JacksonProperties();
 
-		@Autowired
-		private ListableBeanFactory beanFactory;
+		@Autowired(required = false)
+		private List<Module> modules = Collections.emptyList();
 
-		@PostConstruct
-		public void init() {
-			Collection<ObjectMapper> mappers = BeanFactoryUtils
-					.beansOfTypeIncludingAncestors(this.beanFactory, ObjectMapper.class)
-					.values();
-			Collection<Module> modules = BeanFactoryUtils.beansOfTypeIncludingAncestors(
-					this.beanFactory, Module.class).values();
-			for (ObjectMapper mapper : mappers) {
-				mapper.registerModules(modules);
-				if (!mapper.isEnabled(SerializationFeature.INDENT_OUTPUT)) {
-					Boolean prettyPrint = properties.getSerialization().get(
-							SerializationFeature.INDENT_OUTPUT);
-					if (prettyPrint != null) {
-						mapper.configure(SerializationFeature.INDENT_OUTPUT, prettyPrint);
-					}
+		@Bean
+		@ConditionalOnMissingBean
+		public JacksonModule jacksonGuiceModule() {
+			Boolean prettyPrint = properties.getSerialization().get(
+					SerializationFeature.INDENT_OUTPUT);
+			JacksonModule module = new JacksonModule();
+			module.configure(config -> {
+				if (prettyPrint != null) {
+					config.prettyPrint(prettyPrint);
 				}
-			}
-		}
-
-		@Bean
-		@ConditionalOnMissingBean
-		@Primary
-		public ObjectMapper jacksonObjectMapper() {
-			return new ObjectMapper();
-		}
-
-		@Bean
-		@ConditionalOnMissingBean
-		public JsonRenderer jsonRenderer() {
-			return new JsonRenderer(jacksonObjectMapper().writer());
-		}
-
-		@Bean
-		@ConditionalOnMissingBean
-		public JsonParser jsonParser() {
-			return new JsonParser(jacksonObjectMapper());
+				config.modules(modules);
+			});
+			return module;
 		}
 
 	}
@@ -108,26 +78,15 @@ public class RatpackAutoConfiguration {
 		@Autowired
 		private RatpackProperties ratpack;
 
-		@Autowired
-		private LaunchConfig launchConfig;
-
-		@Autowired
-		private ExecControl execControl;
-
 		@Bean
 		@ConditionalOnMissingBean
-		public TextTemplateRenderer groovyTemplateRenderer() {
-			return new TextTemplateRenderer(groovyTemplateRenderingEngine());
-		}
-
-		@Bean
-		@ConditionalOnMissingBean
-		public TextTemplateRenderingEngine groovyTemplateRenderingEngine() {
-			return new TextTemplateRenderingEngine(execControl,
-					launchConfig.getBufferAllocator(), launchConfig.getBaseDir().binding(
-							ratpack.getTemplatesPath()), ratpack.isDevelopment()
-							|| launchConfig.isDevelopment(),
-					ratpack.isStaticallyCompile());
+		public TextTemplateModule textTemplateGuiceModule() {
+			TextTemplateModule module = new TextTemplateModule();
+			module.configure(config -> {
+				config.setTemplatesPath(ratpack.getTemplatesPath());
+				config.setStaticallyCompile(ratpack.isStaticallyCompile());
+			});
+			return module;
 		}
 
 	}

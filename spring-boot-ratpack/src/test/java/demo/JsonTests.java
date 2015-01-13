@@ -79,11 +79,18 @@ public class JsonTests {
 		@SuppressWarnings("unchecked")
 		@Bean
 		public Handler handler() {
-			return context -> context.byMethod(spec -> spec.get(
-					() -> context.render(json(map))).post(() -> {
-				map.putAll(context.parse(fromJson(Map.class)));
-				context.render(json(map));
-			}));
+			// @formatter:off
+			return context -> context.byMethod(spec -> spec
+				.get(
+					() -> context.render(json(map))
+				).post(
+					() -> {
+						map.putAll(context.parse(fromJson(Map.class)));
+						context.render(json(map));
+					}
+				)
+			);
+			// @formatter:on
 		}
 
 		public static void main(String[] args) throws Exception {

@@ -38,7 +38,7 @@ public class ApplicationTests {
 
 	@Test
 	public void contextLoads() {
-		assertEquals("{\"message\":\"Hello World\"}", restTemplate.getForObject(
+		assertEquals("{\n  \"message\" : \"Hello World\"\n}", restTemplate.getForObject(
 				"http://localhost:" + server.getBindPort(), String.class));
 	}
 
