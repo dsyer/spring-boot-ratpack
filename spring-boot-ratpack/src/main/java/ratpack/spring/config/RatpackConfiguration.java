@@ -18,6 +18,7 @@ package ratpack.spring.config;
 
 import javax.annotation.PreDestroy;
 
+import com.google.inject.Module;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -27,16 +28,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
-import ratpack.launch.LaunchConfig;
-import ratpack.launch.LaunchConfigBuilder;
+import ratpack.guice.Guice;
 import ratpack.server.RatpackServer;
-import ratpack.server.RatpackServerBuilder;
+import ratpack.server.ServerConfig;
 import ratpack.spring.config.internal.ChainConfigurers;
-import ratpack.spring.config.internal.SpringBackedHandlerFactory;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 @Configuration
 @Import(ChainConfigurers.class)
@@ -57,24 +56,24 @@ public class RatpackConfiguration implements CommandLineRunner {
 	}
 
 	@Configuration
-	protected static class LaunchConfiguration {
+	protected static class ServerConfigConfiguration {
 
 		@Autowired
 		private RatpackProperties ratpack;
 
 		@Bean
 		@ConditionalOnMissingBean
-		public LaunchConfig ratpackLaunchConfig(ApplicationContext context) {
-			// @formatter:off
-			LaunchConfigBuilder builder = LaunchConfigBuilder
+		public ServerConfig ratpackServerConfig() {
+			ServerConfig.Builder serverConfigBuilder = ServerConfig
 					.baseDir(ratpack.getBasepath())
 					.address(ratpack.getAddress())
 					.threads(ratpack.getMaxThreads());
-			// @formatter:on
+
 			if (ratpack.getPort() != null) {
-				builder.port(ratpack.getPort());
+				serverConfigBuilder.port(ratpack.getPort());
 			}
-			return builder.build(new SpringBackedHandlerFactory(context));
+
+			return serverConfigBuilder.build();
 		}
 
 	}
@@ -84,14 +83,22 @@ public class RatpackConfiguration implements CommandLineRunner {
 	protected static class ServerConfiguration {
 
 		@Autowired
-		private LaunchConfig launchConfig;
+		private ServerConfig serverConfig;
+
+		@Autowired
+		private ChainConfigurers chainConfigurers;
 
 		@Bean
-		public RatpackServer ratpackServer() {
-			RatpackServer server = RatpackServerBuilder.build(launchConfig);
-			return server;
+		public RatpackServer ratpackServer(ApplicationContext context) throws Exception {
+			return RatpackServer.of(ratpackServerSpec ->
+					ratpackServerSpec
+							.serverConfig(serverConfig)
+							.registry(Guice.registry(bindingSpec -> {
+								context.getBeansOfType(Module.class).values().forEach(bindingSpec::add);
+							}))
+							.handlers(chainConfigurers));
 		}
-		
+
 	}
 
 }

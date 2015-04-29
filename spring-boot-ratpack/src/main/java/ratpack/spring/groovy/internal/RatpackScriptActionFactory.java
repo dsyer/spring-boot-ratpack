@@ -34,7 +34,7 @@ import ratpack.handling.Chain;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 @Component
 public class RatpackScriptActionFactory {
@@ -50,9 +50,15 @@ public class RatpackScriptActionFactory {
 
 		private Closure<?> handlersConfigurer;
 		private Closure<?> bindingsConfigurer;
+		private Closure<?> serverConfigurer;
 
 		public void handlers(Closure<?> handlersConfigurer) {
 			this.handlersConfigurer = handlersConfigurer;
+		}
+
+		@Override
+		public void serverConfig(Closure<?> serverConfigurer) {
+			this.serverConfigurer = serverConfigurer;
 		}
 
 		@Override
