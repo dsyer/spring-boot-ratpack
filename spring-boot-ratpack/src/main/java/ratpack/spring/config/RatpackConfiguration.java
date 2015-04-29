@@ -29,8 +29,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 import ratpack.guice.Guice;
+import ratpack.registry.Registry;
 import ratpack.server.RatpackServer;
 import ratpack.server.ServerConfig;
+import ratpack.spring.Spring;
 import ratpack.spring.config.internal.ChainConfigurers;
 
 /**
@@ -93,9 +95,14 @@ public class RatpackConfiguration implements CommandLineRunner {
 			return RatpackServer.of(ratpackServerSpec ->
 					ratpackServerSpec
 							.serverConfig(serverConfig)
-							.registry(Guice.registry(bindingSpec -> {
-								context.getBeansOfType(Module.class).values().forEach(bindingSpec::add);
-							}))
+							.registry(
+									Guice.registry(bindingSpec -> {
+										context.getBeansOfType(Module.class).values().forEach(bindingSpec::add);
+									}).compose(guiceRegistry -> {
+										Registry springRegistry = Spring.spring(context);
+										return guiceRegistry.join(springRegistry);
+									})
+							)
 							.handlers(chainConfigurers));
 		}
 
