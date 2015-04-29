@@ -71,21 +71,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
-		<ratpack.version>0.9.12</ratpack.version>
+		<ratpack.version>0.9.15</ratpack.version>
 	</properties>
-
-	<repositories>
-		<!-- ratpack 0.9.12 depends on snapshots of netty! -->
-		<repository>
-			<id>snapshots</id>
-			<url>http://clinker.netty.io/nexus/content/repositories/snapshots</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
 
 </project>
