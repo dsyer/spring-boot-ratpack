@@ -42,8 +42,8 @@ public class RatpackCompilerAutoConfiguration extends CompilerAutoConfiguration 
 	public void applyDependencies(DependencyCustomizer dependencies)
 			throws CompilationFailedException {
 		dependencies
-				.add("io.ratpack:ratpack-groovy:0.9.12")
-				.add("io.ratpack:ratpack-jackson:0.9.12")
+				.add("io.ratpack:ratpack-groovy:0.9.15")
+				.add("io.ratpack:ratpack-jackson:0.9.15")
 				.add("org.springframework.boot:spring-boot-ratpack:1.0.0.BUILD-SNAPSHOT");
 
 	}

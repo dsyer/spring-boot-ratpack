@@ -31,6 +31,7 @@ import ratpack.groovy.handling.internal.DefaultGroovyChain;
 import ratpack.groovy.internal.ClosureUtil;
 import ratpack.guice.BindingsSpec;
 import ratpack.handling.Chain;
+import ratpack.server.ServerConfig;
 
 /**
  * @author Dave Syer
@@ -98,4 +99,17 @@ public class RatpackScriptActionFactory {
 
 	}
 
+	public Action<ServerConfig> getServer() {
+
+		if (source == null) {
+			return binding -> {
+			};
+		}
+		
+		final RatpackImpl ratpack = new RatpackImpl();
+		ClosureUtil.configureDelegateFirst(ratpack, source.getRatpack());
+
+		return serverConfig -> ClosureUtil.delegatingAction(ratpack.serverConfigurer)
+				.execute(serverConfig);
+	}
 }

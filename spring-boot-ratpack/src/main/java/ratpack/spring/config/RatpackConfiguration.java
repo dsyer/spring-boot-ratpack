@@ -18,7 +18,6 @@ package ratpack.spring.config;
 
 import javax.annotation.PreDestroy;
 
-import com.google.inject.Module;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -29,9 +28,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 import ratpack.guice.Guice;
+import ratpack.registry.Registry;
 import ratpack.server.RatpackServer;
 import ratpack.server.ServerConfig;
+import ratpack.spring.Spring;
 import ratpack.spring.config.internal.ChainConfigurers;
+
+import com.google.inject.Module;
 
 /**
  * @author Dave Syer
@@ -65,8 +68,7 @@ public class RatpackConfiguration implements CommandLineRunner {
 		@ConditionalOnMissingBean
 		public ServerConfig ratpackServerConfig() {
 			ServerConfig.Builder serverConfigBuilder = ServerConfig
-					.baseDir(ratpack.getBasepath())
-					.address(ratpack.getAddress())
+					.baseDir(ratpack.getBasepath()).address(ratpack.getAddress())
 					.threads(ratpack.getMaxThreads());
 
 			if (ratpack.getPort() != null) {
@@ -90,13 +92,17 @@ public class RatpackConfiguration implements CommandLineRunner {
 
 		@Bean
 		public RatpackServer ratpackServer(ApplicationContext context) throws Exception {
-			return RatpackServer.of(ratpackServerSpec ->
-					ratpackServerSpec
-							.serverConfig(serverConfig)
-							.registry(Guice.registry(bindingSpec -> {
-								context.getBeansOfType(Module.class).values().forEach(bindingSpec::add);
-							}))
-							.handlers(chainConfigurers));
+			return RatpackServer.of(ratpackServerSpec -> ratpackServerSpec
+					.serverConfig(serverConfig)
+					.registry(
+							Guice.registry(
+									bindingSpec -> {
+										context.getBeansOfType(Module.class).values()
+												.forEach(bindingSpec::add);
+									}).compose(guiceRegistry -> {
+								Registry springRegistry = Spring.spring(context);
+								return guiceRegistry.join(springRegistry);
+							})).handlers(chainConfigurers));
 		}
 
 	}
