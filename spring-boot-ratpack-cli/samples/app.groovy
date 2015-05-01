@@ -4,6 +4,9 @@ class MyService {
 }
 
 ratpack {
+  serverConfig { builder ->
+    builder.development(true);
+  }
   handlers {
     get { MyService service ->
       render json([msg:service.message()])

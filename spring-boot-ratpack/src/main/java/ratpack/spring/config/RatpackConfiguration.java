@@ -66,9 +66,12 @@ public class RatpackConfiguration implements CommandLineRunner {
 		@Autowired
 		private RatpackProperties ratpack;
 
+		@Autowired
+		private RatpackScriptActionFactory scripts;
+
 		@Bean
 		@ConditionalOnMissingBean
-		public ServerConfig ratpackServerConfig() {
+		public ServerConfig ratpackServerConfig() throws Exception {
 			ServerConfig.Builder serverConfigBuilder = ServerConfig
 					.baseDir(ratpack.getBasepath()).address(ratpack.getAddress())
 					.threads(ratpack.getMaxThreads());
@@ -76,6 +79,8 @@ public class RatpackConfiguration implements CommandLineRunner {
 			if (ratpack.getPort() != null) {
 				serverConfigBuilder.port(ratpack.getPort());
 			}
+			
+			scripts.getServer().execute(serverConfigBuilder);
 
 			return serverConfigBuilder.build();
 		}
