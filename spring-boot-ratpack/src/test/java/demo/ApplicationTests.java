@@ -2,6 +2,7 @@ package demo;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static ratpack.jackson.Jackson.json;
 
 import java.util.Collections;
@@ -38,13 +39,21 @@ public class ApplicationTests {
 	private RatpackServer server;
 
 	@Test
-	public void contextLoads() {
+	public void homePage() {
 		assertEquals(
 				"{" + System.getProperty("line.separator")
 						+ "  \"message\" : \"Hello World\""
 						+ System.getProperty("line.separator") + "}",
 				restTemplate.getForObject("http://localhost:" + server.getBindPort(),
 						String.class));
+	}
+
+	@Test
+	public void notFound() {
+		ResponseEntity<String> response = restTemplate.getForEntity("http://localhost:"
+				+ server.getBindPort() + "/none", String.class);
+		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+		assertNull("Default 404 handler has null body", response.getBody());
 	}
 
 	@Test

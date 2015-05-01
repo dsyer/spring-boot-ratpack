@@ -43,7 +43,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 @Configuration
 @EnableRatpack
 public class RatpackAutoConfiguration {
-
+	
 	@Configuration
 	@ConditionalOnClass(ObjectMapper.class)
 	@EnableConfigurationProperties(JacksonProperties.class)
