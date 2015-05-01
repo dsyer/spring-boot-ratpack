@@ -1,3 +1,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 ratpack.spring.config.RatpackAutoConfiguration,\
+ratpack.spring.groovy.RatpackGroovyAutoConfiguration,\
 ratpack.spring.config.RatpackManagementAutoConfiguration

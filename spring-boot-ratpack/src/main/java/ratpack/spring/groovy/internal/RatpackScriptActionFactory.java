@@ -32,13 +32,14 @@ import ratpack.groovy.internal.ClosureUtil;
 import ratpack.guice.BindingsSpec;
 import ratpack.handling.Chain;
 import ratpack.server.ServerConfig;
+import ratpack.spring.config.RatpackServerCustomizer;
 
 /**
  * @author Dave Syer
  *
  */
 @Component
-public class RatpackScriptActionFactory {
+public class RatpackScriptActionFactory implements RatpackServerCustomizer {
 
 	@Autowired(required = false)
 	private GroovyRatpackSource source;
@@ -70,7 +71,8 @@ public class RatpackScriptActionFactory {
 
 	}
 
-	public List<Action<Chain>> getHandlerActions() {
+	@Override
+	public List<Action<Chain>> getHandlers() {
 
 		if (source == null) {
 			return Collections.emptyList();
@@ -85,6 +87,7 @@ public class RatpackScriptActionFactory {
 
 	}
 
+	@Override
 	public Action<BindingsSpec> getBindings() {
 
 		if (source == null) {
@@ -100,7 +103,8 @@ public class RatpackScriptActionFactory {
 
 	}
 
-	public Action<ServerConfig.Builder> getServer() {
+	@Override
+	public Action<ServerConfig.Builder> getServerConfig() {
 
 		if (source == null) {
 			return binding -> {

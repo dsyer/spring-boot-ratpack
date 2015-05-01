@@ -23,11 +23,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
+import org.springframework.stereotype.Component;
 
 import ratpack.func.Action;
 import ratpack.handling.Chain;
@@ -37,7 +34,7 @@ import ratpack.path.PathBinder;
 import ratpack.path.PathBinding;
 import ratpack.path.internal.DefaultPathBinding;
 import ratpack.server.ServerConfig;
-import ratpack.spring.groovy.internal.RatpackScriptActionFactory;
+import ratpack.spring.config.RatpackServerCustomizer;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -45,9 +42,7 @@ import com.google.common.collect.ImmutableMap;
  * @author Dave Syer
  *
  */
-@Configuration
-@ConditionalOnMissingBean(ChainConfigurers.class)
-@ConditionalOnClass(Chain.class)
+@Component
 public class ChainConfigurers implements Action<Chain> {
 
 	@Autowired(required = false)
@@ -56,15 +51,15 @@ public class ChainConfigurers implements Action<Chain> {
 	@Autowired(required = false)
 	private List<Handler> handlers = Collections.emptyList();
 
-	@Bean
-	protected RatpackScriptActionFactory ratpackScriptBacking() {
-		return new RatpackScriptActionFactory();
-	}
+	@Autowired(required = false)
+	private List<RatpackServerCustomizer> customizers = Collections.emptyList();
 
 	@Override
 	public void execute(Chain chain) throws Exception {
 		List<Action<Chain>> delegates = new ArrayList<Action<Chain>>(this.delegates);
-		delegates.addAll(ratpackScriptBacking().getHandlerActions());
+		for (RatpackServerCustomizer customizer : customizers) {
+			delegates.addAll(customizer.getHandlers());
+		}
 		if (handlers.size() == 1 || delegates.isEmpty()) {
 			delegates.add(singleHandlerAction());
 		}

@@ -16,6 +16,9 @@
 
 package ratpack.spring.config;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +37,6 @@ import ratpack.server.RatpackServer;
 import ratpack.server.ServerConfig;
 import ratpack.spring.Spring;
 import ratpack.spring.config.internal.ChainConfigurers;
-import ratpack.spring.groovy.internal.RatpackScriptActionFactory;
 
 import com.google.inject.Module;
 
@@ -66,8 +68,8 @@ public class RatpackConfiguration implements CommandLineRunner {
 		@Autowired
 		private RatpackProperties ratpack;
 
-		@Autowired
-		private RatpackScriptActionFactory scripts;
+		@Autowired(required = false)
+		private List<RatpackServerCustomizer> customizers = Collections.emptyList();
 
 		@Bean
 		@ConditionalOnMissingBean
@@ -79,8 +81,10 @@ public class RatpackConfiguration implements CommandLineRunner {
 			if (ratpack.getPort() != null) {
 				serverConfigBuilder.port(ratpack.getPort());
 			}
-			
-			scripts.getServer().execute(serverConfigBuilder);
+
+			for (RatpackServerCustomizer customizer : customizers) {
+				customizer.getServerConfig().execute(serverConfigBuilder);
+			}
 
 			return serverConfigBuilder.build();
 		}
@@ -97,8 +101,8 @@ public class RatpackConfiguration implements CommandLineRunner {
 		@Autowired
 		private ChainConfigurers chainConfigurers;
 
-		@Autowired
-		private RatpackScriptActionFactory scripts;
+		@Autowired(required = false)
+		private List<RatpackServerCustomizer> customizers = Collections.emptyList();
 
 		@Bean
 		public RatpackServer ratpackServer(ApplicationContext context) throws Exception {
@@ -111,7 +115,9 @@ public class RatpackConfiguration implements CommandLineRunner {
 				throws Exception {
 			return baseRegistry -> Guice.registry(bindingSpec -> {
 				context.getBeansOfType(Module.class).values().forEach(bindingSpec::add);
-				scripts.getBindings().execute(bindingSpec);
+				for (RatpackServerCustomizer customizer : customizers) {
+					customizer.getBindings().execute(bindingSpec);
+				}
 			}).apply(baseRegistry).join(Spring.spring(context));
 		}
 

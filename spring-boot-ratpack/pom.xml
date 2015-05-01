@@ -48,6 +48,7 @@
 			<groupId>io.ratpack</groupId>
 			<artifactId>ratpack-jackson</artifactId>
 			<version>${ratpack.version}</version>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>io.ratpack</groupId>
