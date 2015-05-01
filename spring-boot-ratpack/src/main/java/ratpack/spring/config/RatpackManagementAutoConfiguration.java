@@ -18,8 +18,6 @@ package ratpack.spring.config;
 import java.util.Collections;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.EndpointAutoConfiguration;
 import org.springframework.boot.actuate.autoconfigure.ManagementServerProperties;
@@ -34,8 +32,6 @@ import org.springframework.util.StringUtils;
 
 import ratpack.func.Action;
 import ratpack.handling.Chain;
-import ratpack.handling.Context;
-import ratpack.handling.Handler;
 import ratpack.jackson.Jackson;
 
 /**
@@ -43,9 +39,8 @@ import ratpack.jackson.Jackson;
  *
  */
 @Configuration
-@ConditionalOnClass(EndpointAutoConfiguration.class)
-@AutoConfigureAfter({ RatpackAutoConfiguration.class,
-		EndpointAutoConfiguration.class })
+@ConditionalOnClass({ EndpointAutoConfiguration.class, Jackson.class })
+@AutoConfigureAfter({ RatpackAutoConfiguration.class, EndpointAutoConfiguration.class })
 @EnableConfigurationProperties
 public class RatpackManagementAutoConfiguration {
 
@@ -68,28 +63,20 @@ public class RatpackManagementAutoConfiguration {
 		@Autowired
 		private ManagementServerProperties management;
 
-		@PostConstruct
-		public void init() {
-
-		}
-
 		@Override
 		public void execute(Chain chain) throws Exception {
 			String prefix = management.getContextPath();
 			if (StringUtils.hasText(prefix)) {
 				prefix = prefix.endsWith("/") ? prefix : prefix + "/";
-			} else {
+			}
+			else {
 				prefix = "";
 			}
 			for (Endpoint<?> endpoint : endpoints) {
-				final Endpoint<?> point = endpoint;
-				if (point.isEnabled()) {
-					chain.get(prefix + endpoint.getId(), new Handler() {
-						@Override
-						public void handle(Context context) throws Exception {
-							context.render(Jackson.json(point.invoke()));
-						}
-					});
+				if (endpoint.isEnabled()) {
+					chain.get(prefix + endpoint.getId(), context ->
+							context.render(Jackson.json(endpoint.invoke()))
+					);
 				}
 			}
 		}

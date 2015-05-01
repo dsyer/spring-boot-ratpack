@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Configuration;
 
 import ratpack.groovy.Groovy;
 import ratpack.spring.config.RatpackAutoConfiguration;
-import ratpack.spring.groovy.internal.RatpackScriptActionFactory;
+import ratpack.spring.groovy.internal.RatpackScriptServerCustomizer;
 
 /**
  * @author Dave Syer
@@ -35,8 +35,8 @@ import ratpack.spring.groovy.internal.RatpackScriptActionFactory;
 public class RatpackGroovyAutoConfiguration {
 
 	@Bean
-	public RatpackScriptActionFactory ratpackScriptActionFactory() {
-		return new RatpackScriptActionFactory();
+	public RatpackScriptServerCustomizer ratpackScriptActionFactory() {
+		return new RatpackScriptServerCustomizer();
 	}
 
 }

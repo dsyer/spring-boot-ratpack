@@ -1,7 +1,6 @@
-package demo;
+package ratpack.spring.test;
 
 import static org.junit.Assert.assertTrue;
-import static ratpack.groovy.Groovy.groovyMarkupTemplate;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,15 +14,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import ratpack.handling.Context;
-import ratpack.handling.Handler;
+import ratpack.func.Action;
+import ratpack.handling.Chain;
 import ratpack.server.RatpackServer;
-import demo.MarkupTests.Application;
+import ratpack.spring.test.StaticResourceTests.Application;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
 @IntegrationTest("server.port=0")
-public class MarkupTests {
+public class StaticResourceTests {
 
 	private TestRestTemplate restTemplate = new TestRestTemplate();
 
@@ -32,8 +31,8 @@ public class MarkupTests {
 
 	@Test
 	public void contextLoads() {
-		String body = restTemplate.getForObject("http://localhost:" + server.getBindPort(), String.class);
-		assertTrue("Wrong body" + body, body.contains("<body>Home"));
+		String body = restTemplate.getForObject("http://localhost:" + server.getBindPort() + "/root/main.css", String.class);
+		assertTrue("Wrong body" + body, body.contains("background"));
 	}
 
 	@Configuration
@@ -41,11 +40,14 @@ public class MarkupTests {
 	protected static class Application {
 		
 		@Bean
-		public Handler handler() {
-			return new Handler() {
+		public Action<Chain> handlers() {
+			return new Action<Chain>() {
 				@Override
-				public void handle(Context context) throws Exception {
-					context.render(groovyMarkupTemplate("markup.html"));
+				public void execute(Chain chain) throws Exception {
+					chain.prefix("root",new Action<Chain>() {	
+						@Override
+						public void execute(Chain chain) throws Exception {chain.assets("root", "index.html"); }
+					});
 				}
 			};
 		}

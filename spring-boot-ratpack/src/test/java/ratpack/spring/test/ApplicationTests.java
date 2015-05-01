@@ -1,4 +1,4 @@
-package demo;
+package ratpack.spring.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -26,7 +26,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import ratpack.func.Action;
 import ratpack.handling.Chain;
 import ratpack.server.RatpackServer;
-import demo.ApplicationTests.Application;
+import ratpack.spring.test.ApplicationTests.Application;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)

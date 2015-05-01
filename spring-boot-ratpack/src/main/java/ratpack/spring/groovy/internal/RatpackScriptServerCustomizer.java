@@ -32,17 +32,19 @@ import ratpack.groovy.internal.ClosureUtil;
 import ratpack.guice.BindingsSpec;
 import ratpack.handling.Chain;
 import ratpack.server.ServerConfig;
-import ratpack.spring.config.RatpackServerCustomizer;
+import ratpack.spring.config.RatpackServerCustomizerAdapter;
 
 /**
  * @author Dave Syer
  *
  */
 @Component
-public class RatpackScriptActionFactory implements RatpackServerCustomizer {
+public class RatpackScriptServerCustomizer extends RatpackServerCustomizerAdapter {
 
 	@Autowired(required = false)
 	private GroovyRatpackSource source;
+
+	private RatpackImpl ratpack = new RatpackImpl();
 
 	protected interface GroovyRatpackSource {
 		Closure<?> getRatpack();
@@ -75,10 +77,9 @@ public class RatpackScriptActionFactory implements RatpackServerCustomizer {
 	public List<Action<Chain>> getHandlers() {
 
 		if (source == null) {
-			return Collections.emptyList();
+			return super.getHandlers();
 		}
 
-		final RatpackImpl ratpack = new RatpackImpl();
 		ClosureUtil.configureDelegateFirst(ratpack, source.getRatpack());
 
 		return Collections.<Action<Chain>> singletonList(chain -> ClosureUtil
@@ -91,11 +92,9 @@ public class RatpackScriptActionFactory implements RatpackServerCustomizer {
 	public Action<BindingsSpec> getBindings() {
 
 		if (source == null) {
-			return binding -> {
-			};
+			return super.getBindings();
 		}
 
-		final RatpackImpl ratpack = new RatpackImpl();
 		ClosureUtil.configureDelegateFirst(ratpack, source.getRatpack());
 
 		return binding -> ClosureUtil.delegatingAction(ratpack.bindingsConfigurer)
@@ -107,11 +106,9 @@ public class RatpackScriptActionFactory implements RatpackServerCustomizer {
 	public Action<ServerConfig.Builder> getServerConfig() {
 
 		if (source == null) {
-			return binding -> {
-			};
+			return super.getServerConfig();
 		}
 		
-		final RatpackImpl ratpack = new RatpackImpl();
 		ClosureUtil.configureDelegateFirst(ratpack, source.getRatpack());
 
 		return serverConfig -> ClosureUtil.delegatingAction(ratpack.serverConfigurer)

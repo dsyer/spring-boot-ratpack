@@ -46,6 +46,8 @@ import org.springframework.core.annotation.Order;
 @Order(DependencyAutoConfigurationTransformation.ORDER - 50)
 public class RatpackAstTransformation implements SpringBootAstTransformation {
 
+	public static final String SOURCE_INTERFACE = "ratpack.spring.groovy.internal.RatpackScriptServerCustomizer.GroovyRatpackSource";
+
 	@Override
 	public void visit(ASTNode[] nodes, SourceUnit source) {
 		for (ASTNode node : nodes) {
@@ -62,7 +64,7 @@ public class RatpackAstTransformation implements SpringBootAstTransformation {
 
 	private class ClassVisitor extends ClassCodeVisitorSupport {
 
-		private static final String SOURCE_INTERFACE = "ratpack.spring.groovy.internal.RatpackScriptActionFactory.GroovyRatpackSource";
+		private static final String SOURCE_INTERFACE = RatpackAstTransformation.SOURCE_INTERFACE;
 		private static final String RATPACK = "ratpack";
 		private final SourceUnit source;
 		private final ClassNode classNode;

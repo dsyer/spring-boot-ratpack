@@ -1,4 +1,4 @@
-package demo;
+package ratpack.spring.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -31,7 +31,7 @@ import ratpack.func.Action;
 import ratpack.handling.Chain;
 import ratpack.handling.Handler;
 import ratpack.server.RatpackServer;
-import demo.JsonTests.Application;
+import ratpack.spring.test.JsonTests.Application;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
