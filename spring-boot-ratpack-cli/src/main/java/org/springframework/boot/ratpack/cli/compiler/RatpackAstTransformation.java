@@ -90,7 +90,7 @@ public class RatpackAstTransformation implements SpringBootAstTransformation {
 				// Add a marker interface to the current script
 				this.classNode.addInterface(ClassHelper.make(SOURCE_INTERFACE));
 				// Implement the interface by adding a public read-only property with the
-				// same name as the method in the interface (getBeans). Make it return the
+				// same name as the method in the interface (getRatpack). Make it return the
 				// closure.
 				this.classNode.addProperty(new PropertyNode(RATPACK, Modifier.PUBLIC
 						| Modifier.FINAL, ClassHelper.CLOSURE_TYPE

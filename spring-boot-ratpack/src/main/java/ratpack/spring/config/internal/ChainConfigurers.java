@@ -16,7 +16,11 @@
 
 package ratpack.spring.config.internal;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -46,10 +50,10 @@ import com.google.common.collect.ImmutableMap;
 @ConditionalOnClass(Chain.class)
 public class ChainConfigurers implements Action<Chain> {
 
-	@Autowired(required=false)
+	@Autowired(required = false)
 	private List<Action<Chain>> delegates = Collections.emptyList();
 
-	@Autowired(required=false)
+	@Autowired(required = false)
 	private List<Handler> handlers = Collections.emptyList();
 
 	@Bean
@@ -57,15 +61,11 @@ public class ChainConfigurers implements Action<Chain> {
 		return new RatpackScriptActionFactory();
 	}
 
+	@Override
 	public void execute(Chain chain) throws Exception {
 		List<Action<Chain>> delegates = new ArrayList<Action<Chain>>(this.delegates);
-		if (delegates.isEmpty()) {
-			delegates.addAll(ratpackScriptBacking().getHandlerActions());
-		}
-		if (handlers.size() == 1) {
-			delegates.add(singleHandlerAction());
-		}
-		else if (delegates.isEmpty()) {
+		delegates.addAll(ratpackScriptBacking().getHandlerActions());
+		if (handlers.size() == 1 || delegates.isEmpty()) {
 			delegates.add(singleHandlerAction());
 		}
 		delegates.add(staticResourcesAction(chain.getServerConfig()));
@@ -79,14 +79,10 @@ public class ChainConfigurers implements Action<Chain> {
 
 	private Action<Chain> staticResourcesAction(final ServerConfig config) {
 		return chain -> {
-			chain.handler(Handlers.path(
-					new RootBinder(),
-					Handlers.assets(config, "static",
-							Arrays.asList("index.html"))));
-			chain.handler(Handlers.path(
-					new RootBinder(),
-					Handlers.assets(config, "public",
-							Arrays.asList("index.html"))));
+			chain.handler(Handlers.path(new RootBinder(),
+					Handlers.assets(config, "static", Arrays.asList("index.html"))));
+			chain.handler(Handlers.path(new RootBinder(),
+					Handlers.assets(config, "public", Arrays.asList("index.html"))));
 		};
 	}
 
@@ -94,7 +90,8 @@ public class ChainConfigurers implements Action<Chain> {
 
 		@Override
 		public Optional<PathBinding> bind(String path, Optional<PathBinding> parentBinding) {
-			return Optional.of(new DefaultPathBinding("/" + path, "", ImmutableMap.<String, String>of(), parentBinding));
+			return Optional.of(new DefaultPathBinding("/" + path, "", ImmutableMap
+					.<String, String> of(), parentBinding));
 		}
 	}
 
@@ -102,7 +99,8 @@ public class ChainConfigurers implements Action<Chain> {
 		return chain -> {
 			if (handlers.size() == 1) {
 				chain.get(handlers.get(0));
-			} else {
+			}
+			else {
 				throw new IllegalStateException(
 						"No Action<Chain> defined so expecting a single Handler (found "
 								+ handlers.size() + ")");

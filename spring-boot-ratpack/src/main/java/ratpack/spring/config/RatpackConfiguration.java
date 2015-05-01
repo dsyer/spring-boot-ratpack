@@ -27,12 +27,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
+import ratpack.func.Function;
 import ratpack.guice.Guice;
 import ratpack.registry.Registry;
 import ratpack.server.RatpackServer;
 import ratpack.server.ServerConfig;
 import ratpack.spring.Spring;
 import ratpack.spring.config.internal.ChainConfigurers;
+import ratpack.spring.groovy.internal.RatpackScriptActionFactory;
 
 import com.google.inject.Module;
 
@@ -90,19 +92,22 @@ public class RatpackConfiguration implements CommandLineRunner {
 		@Autowired
 		private ChainConfigurers chainConfigurers;
 
+		@Autowired
+		private RatpackScriptActionFactory scripts;
+
 		@Bean
 		public RatpackServer ratpackServer(ApplicationContext context) throws Exception {
 			return RatpackServer.of(ratpackServerSpec -> ratpackServerSpec
-					.serverConfig(serverConfig)
-					.registry(
-							Guice.registry(
-									bindingSpec -> {
-										context.getBeansOfType(Module.class).values()
-												.forEach(bindingSpec::add);
-									}).compose(guiceRegistry -> {
-								Registry springRegistry = Spring.spring(context);
-								return guiceRegistry.join(springRegistry);
-							})).handlers(chainConfigurers));
+					.serverConfig(serverConfig).registry(joinedRegistry(context))
+					.handlers(chainConfigurers));
+		}
+
+		private Function<Registry, Registry> joinedRegistry(ApplicationContext context)
+				throws Exception {
+			return baseRegistry -> Guice.registry(bindingSpec -> {
+				context.getBeansOfType(Module.class).values().forEach(bindingSpec::add);
+				scripts.getBindings().execute(bindingSpec);
+			}).apply(baseRegistry).join(Spring.spring(context));
 		}
 
 	}

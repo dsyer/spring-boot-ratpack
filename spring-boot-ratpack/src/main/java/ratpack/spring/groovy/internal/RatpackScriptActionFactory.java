@@ -53,6 +53,7 @@ public class RatpackScriptActionFactory {
 		private Closure<?> bindingsConfigurer;
 		private Closure<?> serverConfigurer;
 
+		@Override
 		public void handlers(Closure<?> handlersConfigurer) {
 			this.handlersConfigurer = handlersConfigurer;
 		}
@@ -99,7 +100,7 @@ public class RatpackScriptActionFactory {
 
 	}
 
-	public Action<ServerConfig> getServer() {
+	public Action<ServerConfig.Builder> getServer() {
 
 		if (source == null) {
 			return binding -> {

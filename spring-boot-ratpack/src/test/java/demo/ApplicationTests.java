@@ -1,6 +1,7 @@
 package demo;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static ratpack.jackson.Jackson.json;
 
 import java.util.Collections;
@@ -38,8 +39,12 @@ public class ApplicationTests {
 
 	@Test
 	public void contextLoads() {
-		assertEquals("{" + System.getProperty("line.separator")  + "  \"message\" : \"Hello World\"" + System.getProperty("line.separator") + "}", restTemplate.getForObject(
-				"http://localhost:" + server.getBindPort(), String.class));
+		assertEquals(
+				"{" + System.getProperty("line.separator")
+						+ "  \"message\" : \"Hello World\""
+						+ System.getProperty("line.separator") + "}",
+				restTemplate.getForObject("http://localhost:" + server.getBindPort(),
+						String.class));
 	}
 
 	@Test
@@ -59,8 +64,13 @@ public class ApplicationTests {
 
 		@Bean
 		public Action<Chain> handler() {
-			return chain -> chain.get(context -> context.render(json(Collections
-					.singletonMap("message", service.message()))));
+			return chain -> chain.get(context -> {
+				// We're not using the registry here directly but it's good to confirm
+				// that it contains our service:
+					assertNotNull(context.get(MessageService.class));
+					context.render(json(Collections.singletonMap("message",
+							service.message())));
+				});
 		}
 
 		public static void main(String[] args) throws Exception {
