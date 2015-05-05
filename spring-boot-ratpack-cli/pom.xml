@@ -24,8 +24,8 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-cli</artifactId>
-            <version>${spring-boot.version}</version>
-            <scope>provided</scope>
+			<version>${spring-boot.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>commons-logging</groupId>
