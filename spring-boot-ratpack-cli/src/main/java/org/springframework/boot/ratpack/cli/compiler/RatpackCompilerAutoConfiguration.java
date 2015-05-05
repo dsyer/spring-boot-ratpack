@@ -58,7 +58,7 @@ public class RatpackCompilerAutoConfiguration extends CompilerAutoConfiguration 
 	private String getVersion() {
 		try {
 			Package pkg = getClass().getPackage();
-			if (pkg != null) {
+			if (pkg != null && pkg.getImplementationVersion()!=null) {
 				return pkg.getImplementationVersion();
 			}
 		}
