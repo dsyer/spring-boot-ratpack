@@ -37,6 +37,8 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 
+import ratpack.server.ServerConfig;
+
 /**
  * @author Dave Syer
  * 
@@ -56,7 +58,7 @@ public class RatpackProperties {
 	@NotNull
 	private String contextPath = "";
 
-	private int maxThreads = 10; // Number of threads in protocol handler
+	private int maxThreads = ServerConfig.DEFAULT_THREADS; // Number of threads in protocol handler
 
 	private String templatesPath = "templates";
 	private int cacheSize = 100;
