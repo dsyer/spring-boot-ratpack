@@ -26,7 +26,6 @@ import org.springframework.stereotype.Component;
 
 import ratpack.func.Action;
 import ratpack.groovy.Groovy;
-import ratpack.groovy.guice.internal.DefaultGroovyBindingsSpec;
 import ratpack.groovy.handling.internal.DefaultGroovyChain;
 import ratpack.groovy.internal.ClosureUtil;
 import ratpack.guice.BindingsSpec;
@@ -98,7 +97,7 @@ public class RatpackScriptServerCustomizer extends RatpackServerCustomizerAdapte
 		ClosureUtil.configureDelegateFirst(ratpack, source.getRatpack());
 
 		return binding -> ClosureUtil.delegatingAction(ratpack.bindingsConfigurer)
-				.execute(new DefaultGroovyBindingsSpec(binding));
+				.execute(binding);
 
 	}
 

@@ -16,10 +16,8 @@
 
 package org.springframework.boot.ratpack.cli;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.net.URI;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,7 +43,9 @@ public class SampleIntegrationTests {
 	public void bindingsSample() throws Exception {
 		this.cli.run("bindings.groovy");
 		String output = this.cli.getHttpOutput();
-		assertTrue("Wrong output: " + output, output.contains("{\"message\":\"Hello World\"}"));
+		assertTrue("Wrong output: " + output, output.contains("\"message\""));
+		assertTrue("Wrong output: " + output, output.contains("\"Hello World\"}"));
+		assertFalse("Wrong output: " + output, output.contains("\n")); // no pretty print
 	}
 
 }

@@ -30,7 +30,7 @@ import org.springframework.boot.cli.compiler.DependencyCustomizer;
  */
 public class RatpackCompilerAutoConfiguration extends CompilerAutoConfiguration {
 
-	public static final String RATPACK_VERSION = "0.9.15";
+	public static final String RATPACK_VERSION = "0.9.17";
 	private static final String DEFAULT_LIBRARY_VERSION = "1.0.0.BUILD-SNAPSHOT";
 	private static final String SOURCE_INTERFACE = RatpackAstTransformation.SOURCE_INTERFACE;
 
