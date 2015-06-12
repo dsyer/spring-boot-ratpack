@@ -25,13 +25,11 @@ import org.springframework.boot.cli.compiler.DependencyCustomizer;
 
 /**
  * {@link CompilerAutoConfiguration} for Ratpack.
- * 
+ *
  * @author Dave Syer
  */
 public class RatpackCompilerAutoConfiguration extends CompilerAutoConfiguration {
 
-	public static final String RATPACK_VERSION = "0.9.18-SNAPSHOT";
-	private static final String DEFAULT_LIBRARY_VERSION = "1.0.0.BUILD-SNAPSHOT";
 	private static final String SOURCE_INTERFACE = RatpackAstTransformation.SOURCE_INTERFACE;
 
 	@Override
@@ -43,9 +41,10 @@ public class RatpackCompilerAutoConfiguration extends CompilerAutoConfiguration 
 	@Override
 	public void applyDependencies(DependencyCustomizer dependencies)
 			throws CompilationFailedException {
-		dependencies.add("io.ratpack:ratpack-groovy:" + RATPACK_VERSION)
-				.add("io.ratpack:ratpack-jackson:" + RATPACK_VERSION)
-				.add("org.springframework.boot:spring-boot-ratpack:" + getVersion());
+		dependencies.add("ratpack-groovy")
+				.add("ratpack-core")
+				// This one needs a full module spec including version ('spring-boot-*' is special)
+				.add("org.springframework.boot:spring-boot-ratpack:" + RatpackVersionsAstTransformation.getVersion());
 
 	}
 
@@ -53,19 +52,6 @@ public class RatpackCompilerAutoConfiguration extends CompilerAutoConfiguration 
 	public void applyImports(ImportCustomizer imports) throws CompilationFailedException {
 		imports.addStaticStars("ratpack.jackson.Jackson", "ratpack.groovy.Groovy")
 				.addImports("ratpack.spring.config.EnableRatpack");
-	}
-
-	private String getVersion() {
-		try {
-			Package pkg = getClass().getPackage();
-			if (pkg != null && pkg.getImplementationVersion()!=null) {
-				return pkg.getImplementationVersion();
-			}
-		}
-		catch (Exception e) {
-			// ignore
-		}
-		return DEFAULT_LIBRARY_VERSION;
 	}
 
 }

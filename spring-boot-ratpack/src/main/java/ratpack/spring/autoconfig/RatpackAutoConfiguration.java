@@ -16,66 +16,30 @@
 
 package ratpack.spring.autoconfig;
 
-import java.util.Collections;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.jackson.JacksonProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnResource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import ratpack.groovy.template.MarkupTemplateModule;
 import ratpack.groovy.template.TextTemplateModule;
 import ratpack.groovy.template.internal.TextTemplateRenderingEngine;
-import ratpack.jackson.JacksonModule;
 import ratpack.spring.config.EnableRatpack;
 import ratpack.spring.config.RatpackProperties;
 
-import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-
 /**
  * @author Dave Syer
- * 
+ *
  */
 @Configuration
 @EnableRatpack
 public class RatpackAutoConfiguration {
 
 	@Configuration
-	@ConditionalOnClass(ObjectMapper.class)
-	@EnableConfigurationProperties(JacksonProperties.class)
-	protected static class ObjectMappers {
-
-		@Autowired
-		private JacksonProperties properties = new JacksonProperties();
-
-		@Autowired(required = false)
-		private List<Module> modules = Collections.emptyList();
-
-		@Bean
-		@ConditionalOnMissingBean
-		public JacksonModule jacksonGuiceModule() {
-			Boolean prettyPrint = properties.getSerialization().get(
-					SerializationFeature.INDENT_OUTPUT);
-			JacksonModule module = new JacksonModule();
-			module.configure(config -> {
-				if (prettyPrint != null) {
-					config.prettyPrint(prettyPrint);
-				}
-				config.modules(modules);
-			});
-			return module;
-		}
-
-	}
-
-	@Configuration
 	@ConditionalOnClass(TextTemplateRenderingEngine.class)
+	@ConditionalOnResource(resources = "${ratpack.templatesPath:templates}")
 	protected static class GroovyTemplateConfiguration {
 
 		@Autowired
@@ -86,7 +50,7 @@ public class RatpackAutoConfiguration {
 		public MarkupTemplateModule markupTemplateGuiceModule() {
 			MarkupTemplateModule module = new MarkupTemplateModule();
 			module.configure(config -> {
-				config.setTemplatesDirectory(ratpack.getTemplatesPath());
+				config.setTemplatesDirectory(this.ratpack.getTemplatesPath());
 			});
 			return module;
 		}
@@ -96,8 +60,8 @@ public class RatpackAutoConfiguration {
 		public TextTemplateModule textTemplateGuiceModule() {
 			TextTemplateModule module = new TextTemplateModule();
 			module.configure(config -> {
-				config.setTemplatesPath(ratpack.getTemplatesPath());
-				config.setStaticallyCompile(ratpack.isStaticallyCompile());
+				config.setTemplatesPath(this.ratpack.getTemplatesPath());
+				config.setStaticallyCompile(this.ratpack.isStaticallyCompile());
 			});
 			return module;
 		}

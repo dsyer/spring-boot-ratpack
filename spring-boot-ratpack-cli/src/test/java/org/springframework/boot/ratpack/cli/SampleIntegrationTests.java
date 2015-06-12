@@ -35,15 +35,15 @@ public class SampleIntegrationTests {
 	public void appSample() throws Exception {
 		this.cli.run("app.groovy");
 		String output = this.cli.getHttpOutput();
-		assertTrue("Wrong output: " + output, output.contains("\"msg\" : \"Hello World\""));
+		assertTrue("Wrong output: " + output,
+				output.contains("\"msg\":\"Hello World\""));
 	}
 
 	@Test
 	public void actuatorSample() throws Exception {
 		this.cli.run("actuator.groovy");
 		String output = this.cli.getHttpOutput("/metrics");
-		assertTrue("Wrong output: " + output,
-				output.contains("\"mem\" : "));
+		assertTrue("Wrong output: " + output, output.contains("\"mem.free\""));
 	}
 
 	@Test

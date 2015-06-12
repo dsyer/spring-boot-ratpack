@@ -1,1 +1,2 @@
+org.springframework.boot.ratpack.cli.compiler.RatpackVersionsAstTransformation
 org.springframework.boot.ratpack.cli.compiler.RatpackAstTransformation

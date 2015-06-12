@@ -1,5 +1,6 @@
 package demo
-import ratpack.jackson.JacksonModule
+@Grab("io.ratpack:ratpack-session:1.0.0")
+import ratpack.session.*
 
 @Service
 class MyService {
@@ -8,15 +9,14 @@ class MyService {
 
 ratpack {
   bindings {
-    def module = new JacksonModule()
-    module.configure {
-      def config -> config.prettyPrint(false)
-    }
-    add(module)
+    module SessionModule
   }
   handlers {
-    get { MyService service ->
-      render json([message:service.message()])
+    get { MyService service, Session session ->
+      session.data.then { data ->
+        data.set('message', service.message())
+        render json([message:service.message()])
+      }
     }
   }
 }

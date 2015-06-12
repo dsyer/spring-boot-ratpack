@@ -41,25 +41,23 @@ public class ApplicationTests {
 	@Test
 	public void homePage() {
 		assertEquals(
-				"{" + System.getProperty("line.separator")
-						+ "  \"message\" : \"Hello World\""
-						+ System.getProperty("line.separator") + "}",
-				restTemplate.getForObject("http://localhost:" + server.getBindPort(),
+				"{\"message\":\"Hello World\"}",
+				this.restTemplate.getForObject("http://localhost:" + this.server.getBindPort(),
 						String.class));
 	}
 
 	@Test
 	public void notFound() {
-		ResponseEntity<String> response = restTemplate.getForEntity("http://localhost:"
-				+ server.getBindPort() + "/none", String.class);
+		ResponseEntity<String> response = this.restTemplate.getForEntity("http://localhost:"
+				+ this.server.getBindPort() + "/none", String.class);
 		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
 		assertNull("Default 404 handler has null body", response.getBody());
 	}
 
 	@Test
 	public void managementEndpoints() {
-		ResponseEntity<String> result = restTemplate.getForEntity("http://localhost:"
-				+ server.getBindPort() + "/dump", String.class);
+		ResponseEntity<String> result = this.restTemplate.getForEntity("http://localhost:"
+				+ this.server.getBindPort() + "/dump", String.class);
 		assertEquals(HttpStatus.OK, result.getStatusCode());
 	}
 
@@ -78,7 +76,7 @@ public class ApplicationTests {
 				// that it contains our service:
 					assertNotNull(context.get(MessageService.class));
 					context.render(json(Collections.singletonMap("message",
-							service.message())));
+							this.service.message())));
 				});
 		}
 

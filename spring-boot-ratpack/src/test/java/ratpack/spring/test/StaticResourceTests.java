@@ -31,7 +31,8 @@ public class StaticResourceTests {
 
 	@Test
 	public void contextLoads() {
-		String body = restTemplate.getForObject("http://localhost:" + server.getBindPort() + "/root/main.css",
+		String body = this.restTemplate.getForObject(
+				"http://localhost:" + this.server.getBindPort() + "/root/main.css",
 				String.class);
 		assertTrue("Wrong body" + body, body.contains("background"));
 	}
@@ -48,7 +49,8 @@ public class StaticResourceTests {
 					chain.prefix("root", new Action<Chain>() {
 						@Override
 						public void execute(Chain chain) throws Exception {
-							chain.files(f -> f.dir("root").indexFiles("index.html"));
+							chain.files(
+									spec -> spec.dir("root").indexFiles("index.html"));
 						}
 					});
 				}

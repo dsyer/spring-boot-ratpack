@@ -45,8 +45,8 @@ public class JsonTests {
 
 	@Test
 	public void get() {
-		String body = restTemplate.getForObject(
-				"http://localhost:" + server.getBindPort(), String.class);
+		String body = this.restTemplate
+				.getForObject("http://localhost:" + this.server.getBindPort(), String.class);
 		assertTrue("Wrong body" + body, body.contains("{"));
 		assertFalse("Wrong body" + body, body.toLowerCase().contains("<html"));
 	}
@@ -57,11 +57,11 @@ public class JsonTests {
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		HttpEntity<Map<String, String>> entity = new HttpEntity<Map<String, String>>(
 				Collections.singletonMap("foo", "bar"), headers);
-		ResponseEntity<String> result = restTemplate.postForEntity("http://localhost:"
-				+ server.getBindPort(), entity, String.class);
+		ResponseEntity<String> result = this.restTemplate.postForEntity(
+				"http://localhost:" + this.server.getBindPort(), entity, String.class);
 		assertEquals(HttpStatus.OK, result.getStatusCode());
-		String body = restTemplate.getForObject(
-				"http://localhost:" + server.getBindPort(), String.class);
+		String body = this.restTemplate
+				.getForObject("http://localhost:" + this.server.getBindPort(), String.class);
 		assertTrue("Wrong body" + body, body.contains("foo"));
 	}
 
@@ -82,11 +82,13 @@ public class JsonTests {
 			// @formatter:off
 			return context -> context.byMethod(spec -> spec
 				.get(
-					() -> context.render(json(map))
+					() -> context.render(json(this.map))
 				).post(
 					() -> {
-						map.putAll(context.parse(fromJson(Map.class)));
-						context.render(json(map));
+						context.parse(fromJson(Map.class)).then(m -> {
+							this.map.putAll(m);
+							context.render(json(this.map));
+						});
 					}
 				)
 			);

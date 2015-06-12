@@ -26,15 +26,15 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+
 import ratpack.func.Action;
 import ratpack.handling.Chain;
 import ratpack.handling.Handler;
 import ratpack.server.RatpackServer;
 import ratpack.spring.test.JsonMapperTests.Application;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = Application.class)
@@ -48,8 +48,8 @@ public class JsonMapperTests {
 
 	@Test
 	public void get() {
-		String body = restTemplate.getForObject(
-				"http://localhost:" + server.getBindPort(), String.class);
+		String body = this.restTemplate
+				.getForObject("http://localhost:" + this.server.getBindPort(), String.class);
 		assertTrue("Wrong body" + body, body.contains("x"));
 		assertFalse("Wrong body" + body, body.toLowerCase().contains("<html"));
 	}
@@ -60,11 +60,11 @@ public class JsonMapperTests {
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		HttpEntity<Map<String, String>> entity = new HttpEntity<Map<String, String>>(
 				Collections.singletonMap("x", "1.0"), headers);
-		ResponseEntity<String> result = restTemplate.postForEntity("http://localhost:"
-				+ server.getBindPort(), entity, String.class);
+		ResponseEntity<String> result = this.restTemplate.postForEntity(
+				"http://localhost:" + this.server.getBindPort(), entity, String.class);
 		assertEquals(HttpStatus.OK, result.getStatusCode());
-		String body = restTemplate.getForObject(
-				"http://localhost:" + server.getBindPort(), String.class);
+		String body = this.restTemplate
+				.getForObject("http://localhost:" + this.server.getBindPort(), String.class);
 		assertTrue("Wrong body" + body, body.contains("x"));
 	}
 
@@ -93,12 +93,11 @@ public class JsonMapperTests {
 		public Handler handler() {
 			return context -> {
 				context.byMethod(spec -> {
-					// @formatter:off	
+					// @formatter:off
 					spec
-						.get(() -> context.render(json(point)))
+						.get(() -> context.render(json(this.point)))
 						.post(() -> {
-							point = context.parse(fromJson(Point.class));
-							context.render(json(point));
+							context.parse(fromJson(Point.class)).then(p -> { this.point = p; context.render(json(this.point)); });
 						});
 					// @formatter:on
 				});
@@ -124,11 +123,11 @@ public class JsonMapperTests {
 			}
 
 			public double getX() {
-				return x;
+				return this.x;
 			}
 
 			public double getY() {
-				return y;
+				return this.y;
 			}
 		}
 

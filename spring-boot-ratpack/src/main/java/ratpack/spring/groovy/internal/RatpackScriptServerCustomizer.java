@@ -16,21 +16,20 @@
 
 package ratpack.spring.groovy.internal;
 
-import groovy.lang.Closure;
-
 import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import groovy.lang.Closure;
 import ratpack.func.Action;
 import ratpack.groovy.Groovy;
 import ratpack.groovy.handling.internal.DefaultGroovyChain;
 import ratpack.groovy.internal.ClosureUtil;
 import ratpack.guice.BindingsSpec;
 import ratpack.handling.Chain;
-import ratpack.server.ServerConfig;
+import ratpack.server.ServerConfigBuilder;
 import ratpack.spring.config.RatpackServerCustomizerAdapter;
 
 /**
@@ -75,42 +74,42 @@ public class RatpackScriptServerCustomizer extends RatpackServerCustomizerAdapte
 	@Override
 	public List<Action<Chain>> getHandlers() {
 
-		if (source == null) {
+		if (this.source == null) {
 			return super.getHandlers();
 		}
 
-		ClosureUtil.configureDelegateFirst(ratpack, source.getRatpack());
+		ClosureUtil.configureDelegateFirst(this.ratpack, this.source.getRatpack());
 
 		return Collections.<Action<Chain>> singletonList(chain -> ClosureUtil
 				.configureDelegateFirst(new DefaultGroovyChain(chain),
-						ratpack.handlersConfigurer));
+						this.ratpack.handlersConfigurer));
 
 	}
 
 	@Override
 	public Action<BindingsSpec> getBindings() {
 
-		if (source == null) {
+		if (this.source == null) {
 			return super.getBindings();
 		}
 
-		ClosureUtil.configureDelegateFirst(ratpack, source.getRatpack());
+		ClosureUtil.configureDelegateFirst(this.ratpack, this.source.getRatpack());
 
-		return binding -> ClosureUtil.delegatingAction(ratpack.bindingsConfigurer)
+		return binding -> ClosureUtil.delegatingAction(this.ratpack.bindingsConfigurer)
 				.execute(binding);
 
 	}
 
 	@Override
-	public Action<ServerConfig.Builder> getServerConfig() {
+	public Action<ServerConfigBuilder> getServerConfig() {
 
-		if (source == null) {
+		if (this.source == null) {
 			return super.getServerConfig();
 		}
-		
-		ClosureUtil.configureDelegateFirst(ratpack, source.getRatpack());
 
-		return serverConfig -> ClosureUtil.delegatingAction(ratpack.serverConfigurer)
+		ClosureUtil.configureDelegateFirst(this.ratpack, this.source.getRatpack());
+
+		return serverConfig -> ClosureUtil.delegatingAction(this.ratpack.serverConfigurer)
 				.execute(serverConfig);
 	}
 }

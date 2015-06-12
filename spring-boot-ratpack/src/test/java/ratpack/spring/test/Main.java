@@ -23,12 +23,11 @@ import org.springframework.context.annotation.Bean;
 
 import ratpack.func.Action;
 import ratpack.handling.Chain;
-import ratpack.jackson.JacksonModule;
 import ratpack.spring.config.EnableRatpack;
 
 /**
  * Quick test app to verify a sample in Ractpack documentation.
- * 
+ *
  * @author Dave Syer
  *
  */
@@ -39,11 +38,6 @@ public class Main {
 	@Bean
 	public Action<Chain> home() {
 		return chain -> chain.get(ctx -> ctx.render(json(Collections.singletonMap("message", "Hello"))));
-	}
-
-	@Bean
-	public JacksonModule jacksonModule() {
-		return new JacksonModule();
 	}
 
 	@Bean
