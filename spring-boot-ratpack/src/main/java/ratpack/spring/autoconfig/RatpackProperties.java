@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ratpack.spring.config;
+package ratpack.spring.autoconfig;
 
 import java.io.IOException;
 import java.net.InetAddress;

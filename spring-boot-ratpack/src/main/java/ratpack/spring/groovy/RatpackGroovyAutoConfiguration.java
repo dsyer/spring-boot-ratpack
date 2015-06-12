@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import ratpack.groovy.Groovy;
-import ratpack.spring.config.RatpackAutoConfiguration;
+import ratpack.spring.autoconfig.RatpackAutoConfiguration;
 import ratpack.spring.groovy.internal.RatpackScriptServerCustomizer;
 
 /**

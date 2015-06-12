@@ -73,7 +73,7 @@ public class JsonTests {
 
 		@Bean
 		public Action<Chain> chain() {
-			return chain -> chain.handler(handler());
+			return chain -> chain.all(handler());
 		}
 
 		@SuppressWarnings("unchecked")

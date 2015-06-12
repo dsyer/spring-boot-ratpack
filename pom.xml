@@ -54,7 +54,7 @@
 		<repository>
 			<id>jcenter</id>
 			<name>Ratpack Snapshots</name>
-			<url>http://oss.jfrog.org/repo/io</url>
+			<url>http://oss.jfrog.org/repo</url>
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>

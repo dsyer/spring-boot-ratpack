@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ratpack.spring.config;
+package ratpack.spring.autoconfig;
 
 import java.util.Collections;
 import java.util.List;

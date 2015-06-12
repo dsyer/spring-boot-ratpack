@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ratpack.spring.config;
+package ratpack.spring.autoconfig;
 
 import java.util.Collections;
 import java.util.List;
@@ -31,6 +31,8 @@ import ratpack.groovy.template.MarkupTemplateModule;
 import ratpack.groovy.template.TextTemplateModule;
 import ratpack.groovy.template.internal.TextTemplateRenderingEngine;
 import ratpack.jackson.JacksonModule;
+import ratpack.spring.config.EnableRatpack;
+import ratpack.spring.config.RatpackProperties;
 
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -31,22 +31,25 @@ public class StaticResourceTests {
 
 	@Test
 	public void contextLoads() {
-		String body = restTemplate.getForObject("http://localhost:" + server.getBindPort() + "/root/main.css", String.class);
+		String body = restTemplate.getForObject("http://localhost:" + server.getBindPort() + "/root/main.css",
+				String.class);
 		assertTrue("Wrong body" + body, body.contains("background"));
 	}
 
 	@Configuration
 	@EnableAutoConfiguration
 	protected static class Application {
-		
+
 		@Bean
 		public Action<Chain> handlers() {
 			return new Action<Chain>() {
 				@Override
 				public void execute(Chain chain) throws Exception {
-					chain.prefix("root",new Action<Chain>() {	
+					chain.prefix("root", new Action<Chain>() {
 						@Override
-						public void execute(Chain chain) throws Exception {chain.assets("root", "index.html"); }
+						public void execute(Chain chain) throws Exception {
+							chain.files(f -> f.dir("root").indexFiles("index.html"));
+						}
 					});
 				}
 			};

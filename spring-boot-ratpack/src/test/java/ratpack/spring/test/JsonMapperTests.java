@@ -86,7 +86,7 @@ public class JsonMapperTests {
 
 		@Bean
 		public Action<Chain> chain() {
-			return chain -> chain.handler(handler());
+			return chain -> chain.all(handler());
 		}
 
 		@Bean
