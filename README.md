@@ -4,19 +4,12 @@ routing and endpoints, and Spring for wiring.
 ## Quick Java Example
 
 ```java
-@ComponentScan
-@Configuration
-@EnableAutoConfiguration
+@SpringBootApplication
 public class Application {
 
     @Bean
     public Handler handler() {
-        return new Handler() {
-            @Override
-            public void handle(Context context) throws Exception {
-                context.render("Hello World");
-            }
-        };
+        return context -> context.render("Hello World");
     }
 
     public static void main(String[] args) throws Exception {
