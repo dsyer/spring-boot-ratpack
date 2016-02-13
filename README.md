@@ -1,5 +1,8 @@
-This project lets you write an application using Ratpack for the HTTP
-routing and endpoints, and Spring for wiring.
+This project provudes autoconfiguration and a CLI extension for Spring 
+Boot with Ratpack. Most of the features enabled here are actually
+already in Ratpack, e.g. see `@EnableRatpack`. Using this project as well
+as `ratpack-spring-boot` means lets you write an application using Ratpack
+and Spring with slightly less overhead, just by adding dependencies.
 
 ## Quick Java Example
 
