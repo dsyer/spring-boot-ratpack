@@ -21,7 +21,7 @@
 	<properties>
 		<main.basedir>${basedir}/..</main.basedir>
         <spring-boot-ratpack.version>1.0.0.BUILD-SNAPSHOT</spring-boot-ratpack.version>
-        <ratpack.version>1.1.1</ratpack.version>
+        <ratpack.version>1.8.0</ratpack.version>
 	</properties>
 	<modules>
 		<module>spring-boot-ratpack</module>
